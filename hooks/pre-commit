@@ -44,3 +44,4 @@ set -e
 git diff-index --check --cached $against --
 
 black --check dikort
+black --check setup.py
