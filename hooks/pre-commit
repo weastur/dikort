@@ -44,4 +44,7 @@ set -e
 git diff-index --check --cached $against --
 
 black --check dikort
-black --check setup.py
+black --check *.py
+
+# Check markdown files
+find . -type d -name '.venv' -prune -o -name '*.md' -print0 | parallel --will-cite --tty -k -j16 -0 -X mdl
