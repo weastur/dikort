@@ -15,10 +15,14 @@ def load_requirements(fname: str) -> list:
     requirements = []
     with open(fname, "r") as fp:
         for req in parse_requirements(fp.read()):
-            extras = "[{}]".format(",".join(req.extras)) if req.extras else ""
-            requirements.append("{}{}{}".format(req.name, extras, req.specifier))
+            extras = "[{0}]".format(",".join(req.extras)) if req.extras else ""
+            requirements.append("{0}{1}{2}".format(req.name, extras, req.specifier))
     return requirements
 
+
+long_description = None
+with open("README.md") as readme:
+    long_description = readme.read()
 
 setup(
     name=module.__name__,
@@ -27,11 +31,12 @@ setup(
     author_email=module.__email__,
     license=module.__license__,
     description=module.__doc__,
-    long_description=open("README.md").read(),
+    long_description=long_description,
     url="https://github.com/weastur/dikort",
     classifiers=[
         "Development Status :: 1 - Planning",
-        "Environment :: Console" "Intended Audience :: Developers",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",

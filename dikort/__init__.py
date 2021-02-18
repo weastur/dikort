@@ -1,6 +1,4 @@
-"""
-Commit messages checking tool
-"""
+"""Commit messages checking tool."""
 
 __author__ = "Pavel Sapezhko"
 __maintainer__ = __author__
