@@ -56,3 +56,6 @@ shellcheck hooks/*
 #flake8
 flake8 dikort
 flake8 setup.py
+
+#Tests
+pytest --cov dikort
