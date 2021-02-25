@@ -1,2 +1,2 @@
 def main():
-    """Entrypoint."""
+    pass
