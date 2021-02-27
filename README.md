@@ -10,5 +10,3 @@ docker build . -t test
 ## git hooks
 
 ln -s -r -t ./.git/hooks/ ./hooks/*
-sudo gem install mdl
-sudo apt install parallel
