@@ -8,7 +8,8 @@ RUN apk update && \
         gcc \
         musl-dev \
         libffi-dev \
-        openssl-dev
+        openssl-dev \
+        cargo
 
 ADD requirements.txt /mnt/
 RUN pip3 install -Ur /mnt/requirements.txt
@@ -22,7 +23,7 @@ RUN cd /mnt/src && \
 
 FROM alpine:3.13.1 as cmd
 
-RUN apk add --no-cache python3 py-pip
+RUN apk add --no-cache python3 py-pip git git-lfs
 
 COPY --from=builder /mnt/src/dist/*.whl /
 
