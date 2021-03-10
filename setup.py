@@ -16,11 +16,12 @@ def load_requirements(fname: str) -> list:
     with open(fname, "r") as fp:
         for req in parse_requirements(fp.read()):
             extras = "[{0}]".format(",".join(req.extras)) if req.extras else ""
-            requirements.append("{0}{1}{2}".format(req.name, extras, req.specifier))
+            requirements.append(
+                "{0}{1}{2}".format(req.name, extras, req.specifier)
+            )
     return requirements
 
 
-long_description = None
 with open("README.md") as readme:
     long_description = readme.read()
 
