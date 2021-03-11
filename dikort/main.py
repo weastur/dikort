@@ -14,4 +14,5 @@ def main():
     configure_logging(config["logging"])
 
 
-main()
+if __name__ == "__main__":
+    main()

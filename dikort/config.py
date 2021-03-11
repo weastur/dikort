@@ -1,5 +1,6 @@
 import configparser
 import logging
+import sys
 
 
 DEFAULTS = {
@@ -28,8 +29,14 @@ def parse(cmd_args):
 
     config = configparser.ConfigParser()
     config.read_dict(DEFAULTS)
-    config.read(cmd_args["main"]["config"])
+    try:
+        with open(cmd_args["main"]["config"]) as config_fp:
+            config.read_file(config_fp)
+    except OSError:
+        print("So sad")
+        sys.exit(1)
     config.read_dict(cmd_args)
+    print(config["main"]["config"])
 
     return config
 

@@ -59,7 +59,7 @@ setup(
     extras_require={"dev": load_requirements("requirements.dev.txt")},
     entry_points={
         "console_scripts": [
-            "{0} = {0}.__main__:main".format(module_name),
+            "{0} = {0}.main:main".format(module_name),
         ]
     },
     include_package_data=True,
