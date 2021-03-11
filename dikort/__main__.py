@@ -10,6 +10,8 @@ def main():
     parser.add_argument(
         "-c", "--config", default="./.dikort.ini", help="Config file location"
     )
-    args = vars(parser.parse_args())
-    config = parse(args)
+    config = parse(parser.parse_args())
     configure_logging(config["logging"])
+
+
+main()

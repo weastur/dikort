@@ -13,10 +13,21 @@ DEFAULTS = {
 }
 
 
+def from_cmdargs_to_config(args):
+    args_dict = vars(args)
+    return {
+        "main": args_dict,
+    }
+
+
 def parse(args):
+    args = from_cmdargs_to_config(args)
+
     config = configparser.ConfigParser()
     config.read_dict(DEFAULTS)
-    config.read(args["config"])
+    config.read_dict(args)
+    config.read(args["main"]["config"])
+
     return config
 
 
