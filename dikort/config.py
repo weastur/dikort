@@ -3,13 +3,16 @@ import logging
 
 
 DEFAULTS = {
+    "main": {
+        "config": "./dikort.cfg",
+    },
     "logging": {
         "enabled": False,
         "format": "%%(levelname)s - %%(asctime)s - %%(filename)s:%%(lineno)d - %%(message)s",
         "datefmt": "%%Y-%%m-%%d %%H:%%M:%%S",
         "level": "INFO",
         "another": True,
-    }
+    },
 }
 
 
