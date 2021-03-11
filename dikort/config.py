@@ -2,6 +2,8 @@ import configparser
 import logging
 import sys
 
+from dikort.print import print_error
+
 
 DEFAULTS = {
     "main": {
@@ -29,11 +31,12 @@ def parse(cmd_args):
 
     config = configparser.ConfigParser()
     config.read_dict(DEFAULTS)
+    config_filename = cmd_args["main"]["config"]
     try:
-        with open(cmd_args["main"]["config"]) as config_fp:
+        with open(config_filename) as config_fp:
             config.read_file(config_fp)
     except OSError:
-        print("So sad")
+        print_error(f"Cannot open file {config_filename}")
         sys.exit(1)
     config.read_dict(cmd_args)
     print(config["main"]["config"])

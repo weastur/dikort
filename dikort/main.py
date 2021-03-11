@@ -1,9 +1,11 @@
 import argparse
+import colorama
 
 from dikort.config import parse, configure_logging
 
 
 def main():
+    colorama.init()
     cmd_args_parser = argparse.ArgumentParser(
         prog="dikort", description="Commit messages checking tool"
     )
