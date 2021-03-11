@@ -28,8 +28,8 @@ def parse(cmd_args):
 
     config = configparser.ConfigParser()
     config.read_dict(DEFAULTS)
-    config.read_dict(cmd_args)
     config.read(cmd_args["main"]["config"])
+    config.read_dict(cmd_args)
 
     return config
 
