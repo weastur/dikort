@@ -2,11 +2,10 @@ import configparser
 import logging
 
 
-def parse(config_location):
+def parse(args):
     config = configparser.ConfigParser()
-    config.read(config_location)
-    print(config.sections())
-    configure_logging(config["logging"])
+    config.read(args["config"])
+    return config
 
 
 def configure_logging(config):
@@ -15,6 +14,6 @@ def configure_logging(config):
         "level": config["level"],
         "datefmt": config["datefmt"],
     }
-    if not config.getboolean('enabled'):
-        logging_config['handlers'] = [logging.NullHandler()]
+    if not config.getboolean("enabled"):
+        logging_config["handlers"] = [logging.NullHandler()]
     logging.basicConfig(**logging_config)

@@ -1,7 +1,6 @@
 import argparse
-import logging
 
-from dikort.config import parse
+from dikort.config import parse, configure_logging
 
 
 def main():
@@ -12,6 +11,5 @@ def main():
         "-c", "--config", default="./.dikort.ini", help="Config file location"
     )
     args = vars(parser.parse_args())
-    print(args)
-    parse(args["config"])
-    logging.info("test")
+    config = parse(args)
+    configure_logging(config["logging"])
