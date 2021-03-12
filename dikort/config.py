@@ -11,8 +11,9 @@ DEFAULTS = {
         "range": "HEAD",
     },
     "rules": {
-        "min_length": 10,
-        "max_length": 50,
+        "min-length": 10,
+        "max-length": 50,
+        "capitalized-summary": True,
     },
     "logging": {
         "enabled": False,

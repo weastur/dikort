@@ -52,6 +52,12 @@ def main():
         "--max-length", default=50, type=int, help="Maximum commit length"
     )
     cmd_args_parser.add_argument(
+        "--capitalized-summary",
+        default=True,
+        type=bool,
+        help="Check is summary message capitalized",
+    )
+    cmd_args_parser.add_argument(
         "range", nargs="?", default="HEAD", help="Commit range"
     )
     config = parse(cmd_args_parser.parse_args())
