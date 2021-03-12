@@ -67,7 +67,7 @@ def _generic_check(commit_range, predicate):
         sys.exit(ERROR_EXIT_CODE)
 
 
-def check(config):
+def analyze_commits(config):
     logging.info("Start checks")
     repository_path = config["main"]["repository"]
     logging.debug("Open repo at %s", repository_path)

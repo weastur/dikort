@@ -6,7 +6,7 @@ import urllib.request
 import colorama
 
 import dikort
-from dikort.analyzer import check
+from dikort.analyzer import analyze_commits
 from dikort.config import configure_argparser, configure_logging, parse
 from dikort.print import print_warning
 
@@ -41,7 +41,7 @@ def main():
     configure_argparser(cmd_args_parser)
     config = parse(cmd_args_parser.parse_args())
     configure_logging(config["logging"])
-    check(config)
+    analyze_commits(config)
 
 
 if __name__ == "__main__":
