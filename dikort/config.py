@@ -5,6 +5,7 @@ import sys
 from dikort.print import print_error
 
 ERROR_EXIT_CODE = 128
+FAILED_EXIT_CODE = 1
 DEFAULTS = {
     "main": {
         "config": "./.dikort.cfg",

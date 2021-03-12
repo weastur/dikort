@@ -1,11 +1,12 @@
 import functools
+import logging
 import re
 import sys
 
 from git import Repo
-from git.exc import InvalidGitRepositoryError, NoSuchPathError, GitCommandError
+from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 
-from dikort.config import ERROR_EXIT_CODE
+from dikort.config import ERROR_EXIT_CODE, FAILED_EXIT_CODE
 from dikort.print import print_error, print_success
 
 
@@ -23,6 +24,7 @@ def _generic_check(commit_range, predicate):
 
 
 def _filter_singleline(commit, *, config):
+    logging.debug("Check %s commit for singleline", commit.hexsha)
     summary_lines_count = commit.summary.count("\n")
     singleline_summary = config["rules.settings"].getboolean(
         "singleline-summary"
@@ -38,6 +40,7 @@ def _filter_singleline(commit, *, config):
 
 
 def _filter_trailing_period(commit, *, config):
+    logging.debug("Check %s commit for trailing period", commit.hexsha)
     summary = commit.summary
     if summary.endswith(".") != config["rules.settings"].getboolean(
         "trailing-period"
@@ -47,6 +50,7 @@ def _filter_trailing_period(commit, *, config):
 
 
 def _filter_capitalized(commit, *, config):
+    logging.debug("Check %s commit for capitalized subject", commit.hexsha)
     summary = commit.summary
     if summary.isalpha() and summary.isupper() == config[
         "rules.settings"
@@ -56,6 +60,7 @@ def _filter_capitalized(commit, *, config):
 
 
 def _filter_length(commit, *, config):
+    logging.debug("Check %s commit for summary message length", commit.hexsha)
     min_length = config["rules.settings"].getint("min-length")
     max_length = config["rules.settings"].getint("max-length")
     length = len(commit.summary)
@@ -74,12 +79,14 @@ def _filter_signoff(commit, *, config):
 
 
 def _filter_gpg(commit, *, config):
+    logging.debug("Check %s commit for GPG sign", commit.hexsha)
     if bool(commit.gpgsig) != config["rules.settings"].getboolean("gpg"):
         return True
     return False
 
 
 def _filter_regex(commit, *, config):
+    logging.debug("Check %s commit for regex", commit.hexsha)
     regex = re.compile(config["rules.settings"].get("regex"))
     if not regex.match(commit.summary):
         return True
@@ -87,6 +94,7 @@ def _filter_regex(commit, *, config):
 
 
 def _filter_author_name_regex(commit, *, config):
+    logging.debug("Check %s commit for author name", commit.hexsha)
     regex = re.compile(config["rules.settings"].get("author-name-regex"))
     if not regex.match(commit.author.name):
         return True
@@ -94,6 +102,7 @@ def _filter_author_name_regex(commit, *, config):
 
 
 def _filter_author_email_regex(commit, *, config):
+    logging.debug("Check %s commit for author email", commit.hexsha)
     regex = re.compile(config["rules.settings"].get("author-email-regex"))
     if not regex.match(commit.author.email):
         return True
@@ -141,7 +150,9 @@ RULES = {
 
 
 def check(config):
+    logging.info("Start checks")
     repository_path = config["main"]["repository"]
+    logging.debug("Open repo at %s", repository_path)
     try:
         repo = Repo(repository_path)
     except (NoSuchPathError, InvalidGitRepositoryError) as err:
@@ -150,7 +161,9 @@ def check(config):
     all_clear = True
     for rule in RULES:
         if not config["rules"].getboolean(RULES[rule]["param"]):
+            logging.info("Rule '%s' disabled. Skip.", rule)
             continue
+        logging.debug("Rule '%s' enabled. Start.", rule)
         print(f"[{rule}] - ", end="")
         predicate = functools.partial(RULES[rule]["filter"], config=config)
         failed = _generic_check(
@@ -159,12 +172,20 @@ def check(config):
         if failed:
             print_error("ERROR")
             all_clear = False
+            logging.info("Failed %d commit for '%s' rule", len(failed), rule)
             for commit in failed:
-                print(f"Hash: {commit.hexsha}, message: {commit.summary}")
+                logging.debug(
+                    "Hash: %s, message: '%s'", commit.hexsha, commit.summary
+                )
+                print(f"Hash: {commit.hexsha}, message: '{commit.summary}'")
         else:
+            logging.info("Errors not found for rule '%s'", rule)
             print_success("SUCCESS")
     if all_clear:
+        logging.info("All clear.")
         print_success("All clear.")
     else:
         print_error("Some checks are failed.")
-        sys.exit(1)
+        logging.info("Some checks are failed.")
+        logging.info("Exit with state %d", FAILED_EXIT_CODE)
+        sys.exit(FAILED_EXIT_CODE)
