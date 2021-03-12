@@ -109,6 +109,17 @@ def _check_author_name_regex(commit_range, config):
     return failed
 
 
+def _check_author_email_regex(commit_range, config):
+    failed = []
+    regex = re.compile(config["rules.settings"].get("author-email-regex"))
+    for commit in commit_range:
+        if len(commit.parents) > 1:
+            continue
+        if not regex.match(commit.author.email):
+            failed.append(commit)
+    return failed
+
+
 RULES = {
     "Summary length": {
         "param": "length",
@@ -141,6 +152,10 @@ RULES = {
     "Author name regex": {
         "param": "author-name-regex",
         "checker": _check_author_name_regex,
+    },
+    "Author email regex": {
+        "param": "author-email-regex",
+        "checker": _check_author_email_regex,
     },
 }
 

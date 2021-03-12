@@ -19,6 +19,7 @@ DEFAULTS = {
         "gpg": False,
         "regex": False,
         "author-name-regex": False,
+        "author-email-regex": False,
     },
     "rules.settings": {
         "min-length": 10,
@@ -30,6 +31,7 @@ DEFAULTS = {
         "gpg": True,
         "regex": ".*",
         "author-name-regex": ".*",
+        "author-email-regex": ".*",
     },
     "logging": {
         "enabled": False,
@@ -55,6 +57,7 @@ def from_cmd_args_to_config(cmd_args):
             "gpg": args_dict["enable_gpg_check"],
             "regex": args_dict["enable_regex_check"],
             "author-name-regex": args_dict["enable_author_name_regex_check"],
+            "author-email-regex": args_dict["enable_author_email_regex_check"],
         },
         "rules.settings": {
             "min-length": args_dict["min_length"],
@@ -66,6 +69,7 @@ def from_cmd_args_to_config(cmd_args):
             "gpg": args_dict["gpg"],
             "regex": args_dict["regex"],
             "author-name-regex": args_dict["author_name_regex"],
+            "author-email-regex": args_dict["author_email_regex"],
         },
         "main": {
             "config": args_dict["config"],
@@ -128,6 +132,9 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--author-name-regex", help="Regex to check author name"
+    )
+    cmd_args_parser.add_argument(
+        "--author-email-regex", help="Regex to check author email"
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
@@ -236,6 +243,12 @@ def configure_argparser(cmd_args_parser):
         action="store_true",
         default=None,
         help="Enable author name check by regex (default: False)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-author-email-regex-check",
+        action="store_true",
+        default=None,
+        help="Enable author email check by regex (default: False)",
     )
     cmd_args_parser.add_argument(
         "range", nargs="?", help="Commit range (default: HEAD)"
