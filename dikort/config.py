@@ -8,6 +8,7 @@ DEFAULTS = {
     "main": {
         "config": "./dikort.cfg",
         "repository": "./",
+        "range": "HEAD",
     },
     "logging": {
         "enabled": False,

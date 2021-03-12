@@ -9,6 +9,7 @@ import colorama
 import dikort
 from dikort.config import configure_logging, parse
 from dikort.print import print_warning
+from dikort.analyzer import check
 
 GITHUB_RELEASES_API_URL = "https://api.github.com/repos/weastur/dikort/releases"
 
@@ -34,6 +35,7 @@ def check_for_new_version():
 def main():
     colorama.init()
     check_for_new_version()
+
     cmd_args_parser = argparse.ArgumentParser(
         prog="dikort", description="Commit messages checking tool"
     )
@@ -43,8 +45,13 @@ def main():
     cmd_args_parser.add_argument(
         "-r", "--repository", default="./", help="Repository location"
     )
+    cmd_args_parser.add_argument(
+        "range", nargs='?', default="HEAD", help="Commit range"
+    )
     config = parse(cmd_args_parser.parse_args())
+
     configure_logging(config["logging"])
+    check(config)
 
 
 if __name__ == "__main__":
