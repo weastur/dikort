@@ -76,6 +76,16 @@ def _check_signoff(commit_range, config):
     return failed
 
 
+def _check_gpg(commit_range, config):
+    failed = []
+    for commit in commit_range:
+        if len(commit.parents) > 1:
+            continue
+        if bool(commit.gpgsig) != config["rules.settings"].getboolean("gpg"):
+            failed.append(commit)
+    return failed
+
+
 RULES = {
     "Summary length": {
         "param": "length",
@@ -96,6 +106,10 @@ RULES = {
     "Signoff": {
         "param": "signoff",
         "checker": _check_signoff,
+    },
+    "GPG": {
+        "param": "gpg",
+        "checker": _check_gpg,
     },
 }
 

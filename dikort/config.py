@@ -17,6 +17,7 @@ DEFAULTS = {
         "trailing-period": True,
         "singleline-summary": True,
         "signoff": False,
+        "gpg": False,
     },
     "rules.settings": {
         "min-length": 10,
@@ -25,6 +26,7 @@ DEFAULTS = {
         "trailing-period": False,
         "singleline-summary": True,
         "signoff": True,
+        "gpg": True,
     },
     "logging": {
         "enabled": False,
@@ -150,13 +152,25 @@ def configure_argparser(cmd_args_parser):
         "--signoff",
         default=None,
         action="store_true",
-        help="Presence of signoff",
+        help="Presence of signoff (default)",
     )
     cmd_args_parser.add_argument(
         "--no-signoff",
         dest="signoff",
         action="store_false",
-        help="No signoff (default)",
+        help="No signoff",
+    )
+    cmd_args_parser.add_argument(
+        "--gpg",
+        default=None,
+        action="store_true",
+        help="Presence of GPG sign (default)",
+    )
+    cmd_args_parser.add_argument(
+        "--no-gpg",
+        dest="gpg",
+        action="store_false",
+        help="No GPG sign",
     )
     cmd_args_parser.add_argument(
         "--enable-length-check",
@@ -187,6 +201,12 @@ def configure_argparser(cmd_args_parser):
         action="store_true",
         default=None,
         help="Enable checking for signoff (default: False)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-gpg-check",
+        action="store_true",
+        default=None,
+        help="Enable checking for GPG sign (default: False)",
     )
     cmd_args_parser.add_argument(
         "range", nargs="?", help="Commit range (default: HEAD)"
