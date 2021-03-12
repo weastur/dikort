@@ -3,17 +3,23 @@ import re
 import sys
 
 from git import Repo
+from git.exc import InvalidGitRepositoryError, NoSuchPathError, GitCommandError
 
+from dikort.config import ERROR_EXIT_CODE
 from dikort.print import print_error, print_success
 
 
 def _generic_check(commit_range, predicate):
-    return list(
-        filter(
-            predicate,
-            filter(lambda commit: len(commit.parents) == 1, commit_range),
+    try:
+        return list(
+            filter(
+                predicate,
+                filter(lambda commit: len(commit.parents) == 1, commit_range),
+            )
         )
-    )
+    except GitCommandError as err:
+        print_error(f"Cannot read commit in rage. Error: {err}")
+        sys.exit(ERROR_EXIT_CODE)
 
 
 def _filter_singleline(commit, *, config):
@@ -135,7 +141,12 @@ RULES = {
 
 
 def check(config):
-    repo = Repo(config["main"]["repository"])
+    repository_path = config["main"]["repository"]
+    try:
+        repo = Repo(repository_path)
+    except (NoSuchPathError, InvalidGitRepositoryError) as err:
+        print_error(f"Cannot open git repo at {repository_path}. Error: {err}")
+        sys.exit(ERROR_EXIT_CODE)
     all_clear = True
     for rule in RULES:
         if not config["rules"].getboolean(RULES[rule]["param"]):
