@@ -4,7 +4,6 @@ import sys
 
 from dikort.print import print_error
 
-
 DEFAULTS = {
     "main": {
         "config": "./dikort.cfg",

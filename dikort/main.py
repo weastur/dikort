@@ -1,7 +1,8 @@
 import argparse
+
 import colorama
 
-from dikort.config import parse, configure_logging
+from dikort.config import configure_logging, parse
 
 
 def main():
