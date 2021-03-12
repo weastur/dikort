@@ -7,6 +7,7 @@ from dikort.print import print_error
 DEFAULTS = {
     "main": {
         "config": "./dikort.cfg",
+        "repository": "./",
     },
     "logging": {
         "enabled": False,

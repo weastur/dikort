@@ -40,6 +40,9 @@ def main():
     cmd_args_parser.add_argument(
         "-c", "--config", default="./.dikort.cfg", help="Config file location"
     )
+    cmd_args_parser.add_argument(
+        "-r", "--repository", default="./", help="Repository location"
+    )
     config = parse(cmd_args_parser.parse_args())
     configure_logging(config["logging"])
 
