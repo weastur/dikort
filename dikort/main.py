@@ -58,6 +58,12 @@ def main():
         help="Check is summary message capitalized",
     )
     cmd_args_parser.add_argument(
+        "--trailing-period",
+        default=False,
+        type=bool,
+        help="Check for trailing period",
+    )
+    cmd_args_parser.add_argument(
         "range", nargs="?", default="HEAD", help="Commit range"
     )
     config = parse(cmd_args_parser.parse_args())

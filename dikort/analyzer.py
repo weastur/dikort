@@ -5,6 +5,16 @@ from git import Repo
 from dikort.print import print_error, print_success
 
 
+def _check_trailing_period(commit):
+    summary = commit.summary
+    if summary.isalpha() and summary.isupper():
+        print_error(
+            f"Commit({commit.hexsha}) summary is not capitalized. Current: {summary}"
+        )
+        return False
+    return True
+
+
 def _check_capitalize(commit):
     summary = commit.summary
     if summary.isalpha() and summary.isupper():
@@ -38,6 +48,8 @@ def check(config):
         )
         if config["rules"].getboolean("capitalized-summary"):
             all_checks_result.append(_check_capitalize(commit))
+        if config["rules"].getboolean("trailing-period"):
+            all_checks_result.append(_check_trailing_period(commit))
     if all(all_checks_result):
         print_success("All clear.")
     else:
