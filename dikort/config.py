@@ -1,4 +1,3 @@
-import argparse
 import configparser
 import logging
 import sys
@@ -18,6 +17,7 @@ DEFAULTS = {
         "singleline-summary": True,
         "signoff": False,
         "gpg": False,
+        "regex": False,
     },
     "rules.settings": {
         "min-length": 10,
@@ -27,6 +27,7 @@ DEFAULTS = {
         "singleline-summary": True,
         "signoff": True,
         "gpg": True,
+        "regex": ".*",
     },
     "logging": {
         "enabled": False,
@@ -111,6 +112,9 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--max-length", type=int, help="Maximum commit length (default: 50)"
+    )
+    cmd_args_parser.add_argument(
+        "--regex", help="Regex to check commit message summary"
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
@@ -207,6 +211,12 @@ def configure_argparser(cmd_args_parser):
         action="store_true",
         default=None,
         help="Enable checking for GPG sign (default: False)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-regex-check",
+        action="store_true",
+        default=None,
+        help="Enable check by regex (default: False)",
     )
     cmd_args_parser.add_argument(
         "range", nargs="?", help="Commit range (default: HEAD)"

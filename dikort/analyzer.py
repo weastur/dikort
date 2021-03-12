@@ -1,3 +1,4 @@
+import re
 import sys
 
 from git import Repo
@@ -68,7 +69,7 @@ def _check_signoff(commit_range, config):
     for commit in commit_range:
         if len(commit.parents) > 1:
             continue
-        last_msg_line = commit.message.rstrip().split('\n')[-1]
+        last_msg_line = commit.message.rstrip().split("\n")[-1]
         if last_msg_line.startswith("Signed-off-by") != config[
             "rules.settings"
         ].getboolean("signoff"):
@@ -82,6 +83,17 @@ def _check_gpg(commit_range, config):
         if len(commit.parents) > 1:
             continue
         if bool(commit.gpgsig) != config["rules.settings"].getboolean("gpg"):
+            failed.append(commit)
+    return failed
+
+
+def _check_regex(commit_range, config):
+    failed = []
+    regex = re.compile(config["rules.settings"].get("regex"))
+    for commit in commit_range:
+        if len(commit.parents) > 1:
+            continue
+        if not regex.match(commit.summary):
             failed.append(commit)
     return failed
 
@@ -110,6 +122,10 @@ RULES = {
     "GPG": {
         "param": "gpg",
         "checker": _check_gpg,
+    },
+    "regex": {
+        "param": "regex",
+        "checker": _check_regex,
     },
 }
 
