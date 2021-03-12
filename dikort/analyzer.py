@@ -98,6 +98,17 @@ def _check_regex(commit_range, config):
     return failed
 
 
+def _check_author_name_regex(commit_range, config):
+    failed = []
+    regex = re.compile(config["rules.settings"].get("author-name-regex"))
+    for commit in commit_range:
+        if len(commit.parents) > 1:
+            continue
+        if not regex.match(commit.author.name):
+            failed.append(commit)
+    return failed
+
+
 RULES = {
     "Summary length": {
         "param": "length",
@@ -123,9 +134,13 @@ RULES = {
         "param": "gpg",
         "checker": _check_gpg,
     },
-    "regex": {
+    "Regex": {
         "param": "regex",
         "checker": _check_regex,
+    },
+    "Author name regex": {
+        "param": "author-name-regex",
+        "checker": _check_author_name_regex,
     },
 }
 
@@ -144,7 +159,7 @@ def check(config):
             print_error("ERROR")
             all_clear = False
             for commit in failed:
-                print(f"Hash: {commit.hexsha}, summary: {commit.summary}")
+                print(f"Hash: {commit.hexsha}, message: {commit.summary}")
         else:
             print_success("SUCCESS")
     if all_clear:

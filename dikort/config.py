@@ -18,6 +18,7 @@ DEFAULTS = {
         "signoff": False,
         "gpg": False,
         "regex": False,
+        "author-name-regex": False,
     },
     "rules.settings": {
         "min-length": 10,
@@ -28,6 +29,7 @@ DEFAULTS = {
         "signoff": True,
         "gpg": True,
         "regex": ".*",
+        "author-name-regex": ".*",
     },
     "logging": {
         "enabled": False,
@@ -49,6 +51,10 @@ def from_cmd_args_to_config(cmd_args):
             ],
             "trailing-period": args_dict["enable_trailing_period_check"],
             "singleline-summary": args_dict["enable_singleline_summary_check"],
+            "signoff": args_dict["enable_signoff_check"],
+            "gpg": args_dict["enable_gpg_check"],
+            "regex": args_dict["enable_regex_check"],
+            "author-name-regex": args_dict["enable_author_name_regex_check"],
         },
         "rules.settings": {
             "min-length": args_dict["min_length"],
@@ -56,6 +62,10 @@ def from_cmd_args_to_config(cmd_args):
             "capitalized-summary": args_dict["capitalized_summary"],
             "trailing-period": args_dict["trailing_period"],
             "singleline-summary": args_dict["singleline_summary"],
+            "signoff": args_dict["signoff"],
+            "gpg": args_dict["gpg"],
+            "regex": args_dict["regex"],
+            "author-name-regex": args_dict["author_name_regex"],
         },
         "main": {
             "config": args_dict["config"],
@@ -115,6 +125,9 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--regex", help="Regex to check commit message summary"
+    )
+    cmd_args_parser.add_argument(
+        "--author-name-regex", help="Regex to check author name"
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
@@ -217,6 +230,12 @@ def configure_argparser(cmd_args_parser):
         action="store_true",
         default=None,
         help="Enable check by regex (default: False)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-author-name-regex-check",
+        action="store_true",
+        default=None,
+        help="Enable author name check by regex (default: False)",
     )
     cmd_args_parser.add_argument(
         "range", nargs="?", help="Commit range (default: HEAD)"
