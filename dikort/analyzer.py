@@ -5,6 +5,16 @@ from git import Repo
 from dikort.print import print_error, print_success
 
 
+def _check_singleline(commit):
+    summary_lines_count = commit.summary.count("\n")
+    if summary_lines_count > 1:
+        print_error(
+            f"Commit({commit.hexsha}) summary is not single line. Current lines count: {summary_lines_count}"
+        )
+        return False
+    return True
+
+
 def _check_trailing_period(commit):
     summary = commit.summary
     if summary.isalpha() and summary.isupper():
@@ -50,6 +60,8 @@ def check(config):
             all_checks_result.append(_check_capitalize(commit))
         if config["rules"].getboolean("trailing-period"):
             all_checks_result.append(_check_trailing_period(commit))
+        if config["rules"].getboolean("singleline-summary"):
+            all_checks_result.append(_check_singleline(commit))
     if all(all_checks_result):
         print_success("All clear.")
     else:

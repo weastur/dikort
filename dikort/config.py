@@ -15,6 +15,7 @@ DEFAULTS = {
         "max-length": 50,
         "capitalized-summary": True,
         "trailing-period": False,
+        "singleline-summary": True,
     },
     "logging": {
         "enabled": False,

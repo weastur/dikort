@@ -64,6 +64,12 @@ def main():
         help="Check for trailing period",
     )
     cmd_args_parser.add_argument(
+        "--singleline-summary",
+        default=True,
+        type=bool,
+        help="Check if summary is single-line",
+    )
+    cmd_args_parser.add_argument(
         "range", nargs="?", default="HEAD", help="Commit range"
     )
     config = parse(cmd_args_parser.parse_args())
