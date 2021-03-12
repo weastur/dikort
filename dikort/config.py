@@ -4,6 +4,7 @@ import sys
 
 from dikort.print import print_error
 
+ERROR_EXIT_CODE = 128
 DEFAULTS = {
     "main": {
         "config": "./.dikort.cfg",
@@ -89,7 +90,7 @@ def from_cmd_args_to_config(cmd_args):
 def parse(cmd_args):
     cmd_args = from_cmd_args_to_config(cmd_args)
 
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(interpolation=None)
     config.read_dict(DEFAULTS)
     config_filename = config["main"]["config"]
     try:
@@ -97,19 +98,19 @@ def parse(cmd_args):
             config.read_file(config_fp)
     except OSError:
         print_error(f"Cannot open file {config_filename}")
-        sys.exit(128)
+        sys.exit(ERROR_EXIT_CODE)
     config.read_dict(cmd_args)
-
+    validate(config)
     return config
 
 
-def configure_logging(config):
+def configure_logging(section):
     logging_config = {
-        "format": config["format"],
-        "level": config["level"],
-        "datefmt": config["datefmt"],
+        "format": section["format"],
+        "level": section["level"],
+        "datefmt": section["datefmt"],
     }
-    if not config.getboolean("enabled"):
+    if not section.getboolean("enabled"):
         logging_config["handlers"] = [logging.NullHandler()]
     logging.basicConfig(**logging_config)
 
@@ -253,3 +254,35 @@ def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
         "range", nargs="?", help="Commit range (default: HEAD)"
     )
+
+
+def _validate_bool(section, key):
+    try:
+        section.getboolean(key)
+    except ValueError:
+        print_error(f"Incorrect value for '{key}' param")
+        sys.exit(ERROR_EXIT_CODE)
+
+
+def _validate_int(section, key):
+    try:
+        section.getint(key)
+    except ValueError:
+        print_error(f"Incorrect value for '{key}' param")
+        sys.exit(ERROR_EXIT_CODE)
+
+
+def validate(config):
+    for key in config["rules"]:
+        _validate_bool(config["rules"], key)
+    _validate_int(config["rules.settings"], "min-length")
+    _validate_int(config["rules.settings"], "max-length")
+    for key in [
+        "capitalized-summary",
+        "trailing-period",
+        "gpg",
+        "signoff",
+        "singleline-summary",
+    ]:
+        _validate_bool(config["rules.settings"], key)
+    _validate_bool(config["logging"], "enabled")
