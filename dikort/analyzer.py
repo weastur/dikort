@@ -11,7 +11,15 @@ def _check_singleline(commit_range, config):
         if len(commit.parents) > 1:
             continue
         summary_lines_count = commit.summary.count("\n")
-        if summary_lines_count > 1:
+        singleline_summary = config["rules.settings"].getboolean(
+            "singleline-summary"
+        )
+        if (
+            summary_lines_count > 1
+            and singleline_summary
+            or summary_lines_count == 1
+            and not singleline_summary
+        ):
             failed.append(commit)
     return failed
 
@@ -22,7 +30,9 @@ def _check_trailing_period(commit_range, config):
         if len(commit.parents) > 1:
             continue
         summary = commit.summary
-        if summary.isalpha() and summary.isupper():
+        if summary.endswith(".") != config["rules.settings"].getboolean(
+            "trailing-period"
+        ):
             failed.append(commit)
     return failed
 
@@ -33,15 +43,17 @@ def _check_capitalized(commit_range, config):
         if len(commit.parents) > 1:
             continue
         summary = commit.summary
-        if summary.isalpha() and summary.isupper():
+        if summary.isalpha() and summary.isupper() == config[
+            "rules.settings"
+        ].getboolean("capitalized-summary"):
             failed.append(commit)
     return failed
 
 
 def _check_length(commit_range, config):
     failed = []
-    min_length = config["rules"].getint("min-length")
-    max_length = config["rules"].getint("max-length")
+    min_length = config["rules.settings"].getint("min-length")
+    max_length = config["rules.settings"].getint("max-length")
     for commit in commit_range:
         if len(commit.parents) > 1:
             continue
@@ -52,10 +64,22 @@ def _check_length(commit_range, config):
 
 
 RULES = {
-    "Summary length": _check_length,
-    "Trailing period": _check_trailing_period,
-    "Capitalized summary": _check_capitalized,
-    "Signle line summary": _check_singleline,
+    "Summary length": {
+        "param": "length",
+        "checker": _check_length,
+    },
+    "Trailing period": {
+        "param": "trailing-period",
+        "checker": _check_trailing_period,
+    },
+    "Capitalized summary": {
+        "param": "capitalized-summary",
+        "checker": _check_capitalized,
+    },
+    "Signle line summary": {
+        "param": "singleline-summary",
+        "checker": _check_singleline,
+    },
 }
 
 
@@ -63,8 +87,10 @@ def check(config):
     repo = Repo(config["main"]["repository"])
     all_clear = True
     for rule in RULES:
+        if not config["rules"].getboolean(RULES[rule]["param"]):
+            continue
         print(f"[{rule}] - ", end="")
-        failed = RULES[rule](
+        failed = RULES[rule]["checker"](
             repo.iter_commits(rev=config["main"]["range"]), config
         )
         if failed:

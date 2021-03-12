@@ -4,19 +4,7 @@ import sys
 
 from dikort.print import print_error
 
-DEFAULTS = {
-    "main": {
-        "config": "./dikort.cfg",
-        "repository": "./",
-        "range": "HEAD",
-    },
-    "rules": {
-        "min-length": 10,
-        "max-length": 50,
-        "capitalized-summary": True,
-        "trailing-period": False,
-        "singleline-summary": True,
-    },
+NON_CMDLINE_DEFAULTS = {
     "logging": {
         "enabled": False,
         "format": "%%(levelname)s - %%(asctime)s - %%(filename)s:%%(lineno)d - %%(message)s",
@@ -29,16 +17,42 @@ DEFAULTS = {
 
 def from_cmd_args_to_config(cmd_args):
     args_dict = vars(cmd_args)
-    return {
-        "main": args_dict,
+    cmd_args_parsed = {
+        "rules": {
+            "length": args_dict["enable_length_check"],
+            "capitalized-summary": args_dict[
+                "enable_capitalized_summary_check"
+            ],
+            "trailing-period": args_dict["enable_trailing_period_check"],
+            "singleline-summary": args_dict["enable_singleline_summary_check"],
+        },
+        "rules.settings": {
+            "min-length": args_dict["min_length"],
+            "max-length": args_dict["max_length"],
+            "capitalized-summary": args_dict["capitalized_summary"],
+            "trailing-period": args_dict["trailing_period"],
+            "singleline-summary": args_dict["singleline_summary"],
+        },
+        "main": {
+            "config": args_dict["config"],
+            "repository": args_dict["repository"],
+            "range": args_dict["range"],
+        },
     }
+    cmd_args = {}
+    for section in cmd_args_parsed:
+        cmd_args[section] = {}
+        for param in cmd_args_parsed[section]:
+            if cmd_args_parsed[section][param] is not None:
+                cmd_args[section][param] = cmd_args_parsed[section][param]
+    return cmd_args
 
 
 def parse(cmd_args):
     cmd_args = from_cmd_args_to_config(cmd_args)
 
     config = configparser.ConfigParser()
-    config.read_dict(DEFAULTS)
+    config.read_dict(NON_CMDLINE_DEFAULTS)
     config_filename = cmd_args["main"]["config"]
     try:
         with open(config_filename) as config_fp:
@@ -70,28 +84,49 @@ def configure_argparser(cmd_args_parser):
         "-r", "--repository", default="./", help="Repository location"
     )
     cmd_args_parser.add_argument(
-        "--min-length", default=10, type=int, help="Minimum commit length"
+        "--min-length", type=int, help="Minimum commit length (default: 10)"
     )
     cmd_args_parser.add_argument(
-        "--max-length", default=50, type=int, help="Maximum commit length"
+        "--max-length", type=int, help="Maximum commit length (default: 50)"
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
-        default=True,
         type=bool,
-        help="Check is summary message capitalized",
+        help="Is summary message capitalized? (default: True)",
     )
     cmd_args_parser.add_argument(
         "--trailing-period",
-        default=False,
         type=bool,
-        help="Check for trailing period",
+        help="There is trailing period? (default: False)",
     )
     cmd_args_parser.add_argument(
         "--singleline-summary",
-        default=True,
         type=bool,
-        help="Check if summary is single-line",
+        help="Is summary single-line? (default: True)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-length-check",
+        action="store_true",
+        default=None,
+        help="Enable length check (default: True)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-capitalized-summary-check",
+        action="store_true",
+        default=None,
+        help="Enable capitalized summary check (default: True)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-trailing-period-check",
+        action="store_true",
+        default=None,
+        help="Enable trailing period check (default: True)",
+    )
+    cmd_args_parser.add_argument(
+        "--enable-singleline-summary-check",
+        action="store_true",
+        default=None,
+        help="Enable single line summary check (default: True)",
     )
     cmd_args_parser.add_argument(
         "range", nargs="?", default="HEAD", help="Commit range"
