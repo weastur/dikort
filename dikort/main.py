@@ -32,6 +32,7 @@ def check_for_new_version():
 
 
 def main():
+    print("Welcome to dikort - the ultimate commit message check tool")
     colorama.init()
     check_for_new_version()
 
