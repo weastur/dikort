@@ -1,7 +1,6 @@
 # dikort
 
 [![Build Status](https://travis-ci.com/weastur/dikort.svg?branch=main)](https://travis-ci.com/weastur/dikort)
-[![DepShield Badge](https://depshield.sonatype.org/badges/weastur/dikort/depshield.svg)](https://depshield.github.io)
 [![codecov](https://codecov.io/gh/weastur/dikort/branch/main/graph/badge.svg)](https://codecov.io/gh/weastur/dikort)
 [![PyPi version](https://img.shields.io/pypi/v/dikort.svg)](https://pypi.org/project/dikort/)
 [![Python versions](https://img.shields.io/pypi/pyversions/dikort)](https://pypi.org/project/dikort/)
