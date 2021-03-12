@@ -9,7 +9,7 @@ python:
   - '3.9'
 
 install:
-  - pip install -e '.[dev]'
+  - pip install '.[dev]'
 
 script:
   - black --check dikort
