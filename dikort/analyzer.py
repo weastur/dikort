@@ -1,3 +1,4 @@
+import functools
 import re
 import sys
 
@@ -6,156 +7,129 @@ from git import Repo
 from dikort.print import print_error, print_success
 
 
-def _check_singleline(commit_range, config):
-    failed = []
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        summary_lines_count = commit.summary.count("\n")
-        singleline_summary = config["rules.settings"].getboolean(
-            "singleline-summary"
+def _generic_check(commit_range, predicate):
+    return list(
+        filter(
+            predicate,
+            filter(lambda commit: len(commit.parents) == 1, commit_range),
         )
-        if (
-            summary_lines_count > 1
-            and singleline_summary
-            or summary_lines_count == 1
-            and not singleline_summary
-        ):
-            failed.append(commit)
-    return failed
+    )
 
 
-def _check_trailing_period(commit_range, config):
-    failed = []
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        summary = commit.summary
-        if summary.endswith(".") != config["rules.settings"].getboolean(
-            "trailing-period"
-        ):
-            failed.append(commit)
-    return failed
+def _filter_singleline(commit, *, config):
+    summary_lines_count = commit.summary.count("\n")
+    singleline_summary = config["rules.settings"].getboolean(
+        "singleline-summary"
+    )
+    if (
+        summary_lines_count > 1
+        and singleline_summary
+        or summary_lines_count == 1
+        and not singleline_summary
+    ):
+        return True
+    return False
 
 
-def _check_capitalized(commit_range, config):
-    failed = []
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        summary = commit.summary
-        if summary.isalpha() and summary.isupper() == config[
-            "rules.settings"
-        ].getboolean("capitalized-summary"):
-            failed.append(commit)
-    return failed
+def _filter_trailing_period(commit, *, config):
+    summary = commit.summary
+    if summary.endswith(".") != config["rules.settings"].getboolean(
+        "trailing-period"
+    ):
+        return True
+    return False
 
 
-def _check_length(commit_range, config):
-    failed = []
+def _filter_capitalized(commit, *, config):
+    summary = commit.summary
+    if summary.isalpha() and summary.isupper() == config[
+        "rules.settings"
+    ].getboolean("capitalized-summary"):
+        return True
+    return False
+
+
+def _filter_length(commit, *, config):
     min_length = config["rules.settings"].getint("min-length")
     max_length = config["rules.settings"].getint("max-length")
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        length = len(commit.summary)
-        if length < min_length or length > max_length:
-            failed.append(commit)
-    return failed
+    length = len(commit.summary)
+    if length < min_length or length > max_length:
+        return True
+    return False
 
 
-def _check_signoff(commit_range, config):
-    failed = []
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        last_msg_line = commit.message.rstrip().split("\n")[-1]
-        if last_msg_line.startswith("Signed-off-by") != config[
-            "rules.settings"
-        ].getboolean("signoff"):
-            failed.append(commit)
-    return failed
+def _filter_signoff(commit, *, config):
+    last_msg_line = commit.message.rstrip().split("\n")[-1]
+    if last_msg_line.startswith("Signed-off-by") != config[
+        "rules.settings"
+    ].getboolean("signoff"):
+        return True
+    return False
 
 
-def _check_gpg(commit_range, config):
-    failed = []
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        if bool(commit.gpgsig) != config["rules.settings"].getboolean("gpg"):
-            failed.append(commit)
-    return failed
+def _filter_gpg(commit, *, config):
+    if bool(commit.gpgsig) != config["rules.settings"].getboolean("gpg"):
+        return True
+    return False
 
 
-def _check_regex(commit_range, config):
-    failed = []
+def _filter_regex(commit, *, config):
     regex = re.compile(config["rules.settings"].get("regex"))
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        if not regex.match(commit.summary):
-            failed.append(commit)
-    return failed
+    if not regex.match(commit.summary):
+        return True
+    return False
 
 
-def _check_author_name_regex(commit_range, config):
-    failed = []
+def _filter_author_name_regex(commit, *, config):
     regex = re.compile(config["rules.settings"].get("author-name-regex"))
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        if not regex.match(commit.author.name):
-            failed.append(commit)
-    return failed
+    if not regex.match(commit.author.name):
+        return True
+    return False
 
 
-def _check_author_email_regex(commit_range, config):
-    failed = []
+def _filter_author_email_regex(commit, *, config):
     regex = re.compile(config["rules.settings"].get("author-email-regex"))
-    for commit in commit_range:
-        if len(commit.parents) > 1:
-            continue
-        if not regex.match(commit.author.email):
-            failed.append(commit)
-    return failed
+    if not regex.match(commit.author.email):
+        return True
+    return False
 
 
 RULES = {
     "Summary length": {
         "param": "length",
-        "checker": _check_length,
+        "filter": _filter_length,
     },
     "Trailing period": {
         "param": "trailing-period",
-        "checker": _check_trailing_period,
+        "filter": _filter_trailing_period,
     },
     "Capitalized summary": {
         "param": "capitalized-summary",
-        "checker": _check_capitalized,
+        "filter": _filter_capitalized,
     },
     "Signle line summary": {
         "param": "singleline-summary",
-        "checker": _check_singleline,
+        "filter": _filter_singleline,
     },
     "Signoff": {
         "param": "signoff",
-        "checker": _check_signoff,
+        "filter": _filter_signoff,
     },
     "GPG": {
         "param": "gpg",
-        "checker": _check_gpg,
+        "filter": _filter_gpg,
     },
     "Regex": {
         "param": "regex",
-        "checker": _check_regex,
+        "filter": _filter_regex,
     },
     "Author name regex": {
         "param": "author-name-regex",
-        "checker": _check_author_name_regex,
+        "filter": _filter_author_name_regex,
     },
     "Author email regex": {
         "param": "author-email-regex",
-        "checker": _check_author_email_regex,
+        "filter": _filter_author_email_regex,
     },
 }
 
@@ -167,8 +141,9 @@ def check(config):
         if not config["rules"].getboolean(RULES[rule]["param"]):
             continue
         print(f"[{rule}] - ", end="")
-        failed = RULES[rule]["checker"](
-            repo.iter_commits(rev=config["main"]["range"]), config
+        predicate = functools.partial(RULES[rule]["filter"], config=config)
+        failed = _generic_check(
+            repo.iter_commits(rev=config["main"]["range"]), predicate
         )
         if failed:
             print_error("ERROR")
