@@ -8,7 +8,7 @@ import colorama
 
 import dikort
 from dikort.analyzer import check
-from dikort.config import configure_logging, parse, configure_argparser
+from dikort.config import configure_argparser, configure_logging, parse
 from dikort.print import print_warning
 
 GITHUB_RELEASES_API_URL = "https://api.github.com/repos/weastur/dikort/releases"
