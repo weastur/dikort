@@ -40,7 +40,6 @@ DEFAULTS = {
         "format": "%%(levelname)s - %%(asctime)s - %%(filename)s:%%(lineno)d - %%(message)s",
         "datefmt": "%%Y-%%m-%%d %%H:%%M:%%S",
         "level": "INFO",
-        "another": True,
     },
 }
 
@@ -137,6 +136,24 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--author-email-regex", help="Regex to check author email"
+    )
+    cmd_args_parser.add_argument(
+        "--enable-logging",
+        help="Enable logs output to stderr (default: False)",
+        default=None,
+        action="store_true",
+    )
+    cmd_args_parser.add_argument(
+        "--logging-format",
+        help="Format string for logging (Python style)",
+    )
+    cmd_args_parser.add_argument(
+        "--logging-datefmt",
+        help="Format string for logging datetime (Python style)",
+    )
+    cmd_args_parser.add_argument(
+        "--logging-level",
+        help="Logging level (Python style)",
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
