@@ -1,10 +1,31 @@
+import argparse
 import configparser
 import logging
 import sys
 
 from dikort.print import print_error
 
-NON_CMDLINE_DEFAULTS = {
+DEFAULTS = {
+    "main": {
+        "config": "./.dikort.cfg",
+        "repository": "./",
+        "range": "HEAD",
+    },
+    "rules": {
+        "length": True,
+        "capitalized-summary": True,
+        "trailing-period": True,
+        "singleline-summary": True,
+        "signoff": False,
+    },
+    "rules.settings": {
+        "min-length": 10,
+        "max-length": 50,
+        "capitalized-summary": True,
+        "trailing-period": False,
+        "singleline-summary": True,
+        "signoff": True,
+    },
     "logging": {
         "enabled": False,
         "format": "%%(levelname)s - %%(asctime)s - %%(filename)s:%%(lineno)d - %%(message)s",
@@ -52,8 +73,8 @@ def parse(cmd_args):
     cmd_args = from_cmd_args_to_config(cmd_args)
 
     config = configparser.ConfigParser()
-    config.read_dict(NON_CMDLINE_DEFAULTS)
-    config_filename = cmd_args["main"]["config"]
+    config.read_dict(DEFAULTS)
+    config_filename = config["main"]["config"]
     try:
         with open(config_filename) as config_fp:
             config.read_file(config_fp)
@@ -78,10 +99,10 @@ def configure_logging(config):
 
 def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
-        "-c", "--config", default="./.dikort.cfg", help="Config file location"
+        "-c", "--config", help="Config file location (default: ./.dikort.cfg"
     )
     cmd_args_parser.add_argument(
-        "-r", "--repository", default="./", help="Repository location"
+        "-r", "--repository", help="Repository location (default: ./)"
     )
     cmd_args_parser.add_argument(
         "--min-length", type=int, help="Minimum commit length (default: 10)"
@@ -91,18 +112,51 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
-        type=bool,
-        help="Is summary message capitalized? (default: True)",
+        default=None,
+        action="store_true",
+        help="Capitalized summary (default)",
+    )
+    cmd_args_parser.add_argument(
+        "--no-capitalized-summary",
+        dest="capitalized-summary",
+        action="store_false",
+        help="Not capitalized summary",
     )
     cmd_args_parser.add_argument(
         "--trailing-period",
-        type=bool,
-        help="There is trailing period? (default: False)",
+        default=None,
+        action="store_true",
+        help="Presence of trailing period",
+    )
+    cmd_args_parser.add_argument(
+        "--no-trailing-period",
+        dest="trailing-period",
+        action="store_false",
+        help="No trailing period (default)",
     )
     cmd_args_parser.add_argument(
         "--singleline-summary",
-        type=bool,
-        help="Is summary single-line? (default: True)",
+        default=None,
+        action="store_true",
+        help="Singleline summary (default)",
+    )
+    cmd_args_parser.add_argument(
+        "--no-singleline-summary",
+        dest="singleline-summary",
+        action="store_false",
+        help="Multiline summary",
+    )
+    cmd_args_parser.add_argument(
+        "--signoff",
+        default=None,
+        action="store_true",
+        help="Presence of signoff",
+    )
+    cmd_args_parser.add_argument(
+        "--no-signoff",
+        dest="signoff",
+        action="store_false",
+        help="No signoff (default)",
     )
     cmd_args_parser.add_argument(
         "--enable-length-check",
@@ -129,5 +183,11 @@ def configure_argparser(cmd_args_parser):
         help="Enable single line summary check (default: True)",
     )
     cmd_args_parser.add_argument(
-        "range", nargs="?", default="HEAD", help="Commit range"
+        "--enable-signoff-check",
+        action="store_true",
+        default=None,
+        help="Enable checking for signoff (default: False)",
+    )
+    cmd_args_parser.add_argument(
+        "range", nargs="?", help="Commit range (default: HEAD)"
     )

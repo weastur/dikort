@@ -63,6 +63,19 @@ def _check_length(commit_range, config):
     return failed
 
 
+def _check_signoff(commit_range, config):
+    failed = []
+    for commit in commit_range:
+        if len(commit.parents) > 1:
+            continue
+        last_msg_line = commit.message.rstrip().split('\n')[-1]
+        if last_msg_line.startswith("Signed-off-by") != config[
+            "rules.settings"
+        ].getboolean("signoff"):
+            failed.append(commit)
+    return failed
+
+
 RULES = {
     "Summary length": {
         "param": "length",
@@ -79,6 +92,10 @@ RULES = {
     "Signle line summary": {
         "param": "singleline-summary",
         "checker": _check_singleline,
+    },
+    "Signoff": {
+        "param": "signoff",
+        "checker": _check_signoff,
     },
 }
 
