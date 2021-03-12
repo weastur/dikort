@@ -9,3 +9,8 @@ def print_error(*args, sep=" ", end="\n"):
 def print_warning(*args, sep=" ", end="\n"):
     line = sep.join(args)
     print(f"{Fore.YELLOW}{line}{Fore.RESET}", end=end)
+
+
+def print_success(*args, sep=" ", end="\n"):
+    line = sep.join(args)
+    print(f"{Fore.GREEN}{line}{Fore.RESET}", end=end)

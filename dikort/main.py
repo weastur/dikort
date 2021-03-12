@@ -7,9 +7,9 @@ import urllib.request
 import colorama
 
 import dikort
+from dikort.analyzer import check
 from dikort.config import configure_logging, parse
 from dikort.print import print_warning
-from dikort.analyzer import check
 
 GITHUB_RELEASES_API_URL = "https://api.github.com/repos/weastur/dikort/releases"
 
@@ -46,7 +46,13 @@ def main():
         "-r", "--repository", default="./", help="Repository location"
     )
     cmd_args_parser.add_argument(
-        "range", nargs='?', default="HEAD", help="Commit range"
+        "--min-length", default=10, type=int, help="Minimum commit length"
+    )
+    cmd_args_parser.add_argument(
+        "--max-length", default=50, type=int, help="Maximum commit length"
+    )
+    cmd_args_parser.add_argument(
+        "range", nargs="?", default="HEAD", help="Commit range"
     )
     config = parse(cmd_args_parser.parse_args())
 

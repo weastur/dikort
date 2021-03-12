@@ -10,6 +10,10 @@ DEFAULTS = {
         "repository": "./",
         "range": "HEAD",
     },
+    "rules": {
+        "min_length": 10,
+        "max_length": 50,
+    },
     "logging": {
         "enabled": False,
         "format": "%%(levelname)s - %%(asctime)s - %%(filename)s:%%(lineno)d - %%(message)s",
@@ -38,9 +42,8 @@ def parse(cmd_args):
             config.read_file(config_fp)
     except OSError:
         print_error(f"Cannot open file {config_filename}")
-        sys.exit(1)
+        sys.exit(128)
     config.read_dict(cmd_args)
-    print(config["main"]["config"])
 
     return config
 
