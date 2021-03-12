@@ -60,3 +60,39 @@ def configure_logging(config):
     if not config.getboolean("enabled"):
         logging_config["handlers"] = [logging.NullHandler()]
     logging.basicConfig(**logging_config)
+
+
+def configure_argparser(cmd_args_parser):
+    cmd_args_parser.add_argument(
+        "-c", "--config", default="./.dikort.cfg", help="Config file location"
+    )
+    cmd_args_parser.add_argument(
+        "-r", "--repository", default="./", help="Repository location"
+    )
+    cmd_args_parser.add_argument(
+        "--min-length", default=10, type=int, help="Minimum commit length"
+    )
+    cmd_args_parser.add_argument(
+        "--max-length", default=50, type=int, help="Maximum commit length"
+    )
+    cmd_args_parser.add_argument(
+        "--capitalized-summary",
+        default=True,
+        type=bool,
+        help="Check is summary message capitalized",
+    )
+    cmd_args_parser.add_argument(
+        "--trailing-period",
+        default=False,
+        type=bool,
+        help="Check for trailing period",
+    )
+    cmd_args_parser.add_argument(
+        "--singleline-summary",
+        default=True,
+        type=bool,
+        help="Check if summary is single-line",
+    )
+    cmd_args_parser.add_argument(
+        "range", nargs="?", default="HEAD", help="Commit range"
+    )

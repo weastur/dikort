@@ -8,7 +8,7 @@ import colorama
 
 import dikort
 from dikort.analyzer import check
-from dikort.config import configure_logging, parse
+from dikort.config import configure_logging, parse, configure_argparser
 from dikort.print import print_warning
 
 GITHUB_RELEASES_API_URL = "https://api.github.com/repos/weastur/dikort/releases"
@@ -39,39 +39,8 @@ def main():
     cmd_args_parser = argparse.ArgumentParser(
         prog="dikort", description="Commit messages checking tool"
     )
-    cmd_args_parser.add_argument(
-        "-c", "--config", default="./.dikort.cfg", help="Config file location"
-    )
-    cmd_args_parser.add_argument(
-        "-r", "--repository", default="./", help="Repository location"
-    )
-    cmd_args_parser.add_argument(
-        "--min-length", default=10, type=int, help="Minimum commit length"
-    )
-    cmd_args_parser.add_argument(
-        "--max-length", default=50, type=int, help="Maximum commit length"
-    )
-    cmd_args_parser.add_argument(
-        "--capitalized-summary",
-        default=True,
-        type=bool,
-        help="Check is summary message capitalized",
-    )
-    cmd_args_parser.add_argument(
-        "--trailing-period",
-        default=False,
-        type=bool,
-        help="Check for trailing period",
-    )
-    cmd_args_parser.add_argument(
-        "--singleline-summary",
-        default=True,
-        type=bool,
-        help="Check if summary is single-line",
-    )
-    cmd_args_parser.add_argument(
-        "range", nargs="?", default="HEAD", help="Commit range"
-    )
+    configure_argparser(cmd_args_parser)
+
     config = parse(cmd_args_parser.parse_args())
 
     configure_logging(config["logging"])
