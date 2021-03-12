@@ -1,6 +1,5 @@
 import argparse
 import json
-import logging
 import urllib.error
 import urllib.request
 
