@@ -18,6 +18,7 @@ def check_for_new_version():
         with urllib.request.urlopen(GITHUB_RELEASES_API_URL, timeout=1) as resp:
             releases = json.loads(resp.read())
     except urllib.error.URLError as err:
+        print_warning(f"Cannot check for new version. Error: {err}")
         return
     tags = [release["tag_name"] for release in releases]
     if not tags:
@@ -30,7 +31,7 @@ def check_for_new_version():
         )
 
 
-def main():
+def main():  # pragma: nocover
     print("Welcome to dikort - the ultimate commit message check tool")
     colorama.init()
     check_for_new_version()
@@ -44,5 +45,5 @@ def main():
     analyze_commits(config)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: nocover
     main()
