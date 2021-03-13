@@ -6,13 +6,18 @@ from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 
 from dikort.config import ERROR_EXIT_CODE, FAILED_EXIT_CODE
-from dikort.filters import _filter_author_email_regex, \
-    _filter_author_name_regex, _filter_capitalized, \
-    _filter_gpg, _filter_length, \
-    _filter_regex, _filter_signoff, _filter_singleline, \
-    _filter_trailing_period
+from dikort.filters import (
+    _filter_author_email_regex,
+    _filter_author_name_regex,
+    _filter_capitalized,
+    _filter_gpg,
+    _filter_length,
+    _filter_regex,
+    _filter_signoff,
+    _filter_singleline,
+    _filter_trailing_period,
+)
 from dikort.print import print_error, print_success
-
 
 RULES = {
     "Summary length": {

@@ -30,10 +30,12 @@ def _filter_trailing_period(commit, *, config):
 
 def _filter_capitalized(commit, *, config):
     logging.debug("Check %s commit for capitalized subject", commit.hexsha)
-    summary = commit.summary
-    if summary.isalpha() and summary.isupper() == config[
-        "rules.settings"
-    ].getboolean("capitalized-summary"):
+    summary_first_letter = commit.summary[0]
+    if (
+        summary_first_letter.isalpha()
+        and summary_first_letter.isupper()
+        != config["rules.settings"].getboolean("capitalized-summary")
+    ):
         return True
     return False
 
