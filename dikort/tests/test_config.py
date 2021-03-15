@@ -7,13 +7,13 @@ from unittest.mock import Mock, patch
 from dikort.config import (
     DEFAULTS,
     ERROR_EXIT_CODE,
+    _from_cmd_args_to_config,
+    _validate,
     _validate_bool,
     _validate_int,
     configure_argparser,
     configure_logging,
-    from_cmd_args_to_config,
-    parse,
-    validate,
+    merge,
 )
 
 
@@ -72,7 +72,7 @@ class TestValidators(TestCase):
             "logging": {"enabled": "no"},
         }
         self.config.read_dict(config)
-        validate(self.config)
+        _validate(self.config)
         self.assertEqual(validate_int_mock.call_count, 2)
         self.assertEqual(validate_bool_mock.call_count, 7)
 
@@ -127,7 +127,7 @@ class TestParsing(TestCase):
     def test_from_cmdargs_to_config(self):
         parser = argparse.ArgumentParser()
         configure_argparser(parser)
-        result = from_cmd_args_to_config(
+        result = _from_cmd_args_to_config(
             parser.parse_args(["--config=./myconfig.cfg", "--min-length=20"])
         )
         self.assertDictEqual(
@@ -143,7 +143,9 @@ class TestParsing(TestCase):
             },
         )
 
-        result = from_cmd_args_to_config(parser.parse_args(["--enable-length"]))
+        result = _from_cmd_args_to_config(
+            parser.parse_args(["--enable-length"])
+        )
         self.assertDictEqual(
             result,
             {
@@ -163,7 +165,7 @@ class TestParsing(TestCase):
         configure_argparser(parser)
 
         open_mock.return_value = io.StringIO()
-        config = parse(parser.parse_args([]))
+        config = merge(parser.parse_args([]))
         self._assert_configs_equals(config, expected_config)
 
         open_mock.assert_called_once()
@@ -172,6 +174,6 @@ class TestParsing(TestCase):
         open_mock.reset_mock()
         print_error_mock.reset_mock()
         open_mock.side_effect = OSError("ops!")
-        config = parse(parser.parse_args([]))
+        config = merge(parser.parse_args([]))
         print_error_mock.assert_called_once()
         sys_exit_mock.assert_called_once_with(ERROR_EXIT_CODE)

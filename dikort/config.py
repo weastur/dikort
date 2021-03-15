@@ -2,8 +2,20 @@ import configparser
 import logging
 import sys
 
-from dikort.print import print_error
+from dikort.print import print_error, print_warning
 
+_FILE_CONFIG_INT_OPTIONS = ("min_length", "max_length")
+_FILE_CONFIG_BOOL_OPTIONS = (
+    "length",
+    "capitalized_summary",
+    "trailing_period",
+    "singleline_summary",
+    "signoff",
+    "gpg",
+    "regex",
+    "author_name_regex",
+    "author_email_regex",
+)
 ERROR_EXIT_CODE = 128
 FAILED_EXIT_CODE = 1
 DEFAULTS = {
@@ -14,94 +26,82 @@ DEFAULTS = {
     },
     "rules": {
         "length": True,
-        "capitalized-summary": True,
-        "trailing-period": True,
-        "singleline-summary": True,
+        "capitalized_summary": True,
+        "trailing_period": True,
+        "singleline_summary": True,
         "signoff": False,
         "gpg": False,
         "regex": False,
-        "author-name-regex": False,
-        "author-email-regex": False,
+        "author_name_regex": False,
+        "author_email_regex": False,
     },
     "rules.settings": {
-        "min-length": 10,
-        "max-length": 50,
-        "capitalized-summary": True,
-        "trailing-period": False,
-        "singleline-summary": True,
+        "min_length": 10,
+        "max_length": 50,
+        "capitalized_summary": True,
+        "trailing_period": False,
+        "singleline_summary": True,
         "signoff": True,
         "gpg": True,
         "regex": ".*",
-        "author-name-regex": ".*",
-        "author-email-regex": ".*",
+        "author_name_regex": ".*",
+        "author_email_regex": ".*",
     },
     "logging": {
         "enabled": False,
-        "format": "%%(levelname)s - %%(asctime)s - %%(filename)s:%%(lineno)d - %%(message)s",
-        "datefmt": "%%Y-%%m-%%d %%H:%%M:%%S",
+        "format": "%(levelname)s - %(asctime)s - %(filename)s:%(lineno)d - %(message)s",
+        "datefmt": "%Y-%m-%d %H:%M:%S",
         "level": "INFO",
     },
 }
 
 
-def from_cmd_args_to_config(cmd_args):
+def _from_cmd_args_to_config(cmd_args):
     args_dict = vars(cmd_args)
-    cmd_args_parsed = {
-        "rules": {
-            "length": args_dict["enable_length_check"],
-            "capitalized-summary": args_dict[
-                "enable_capitalized_summary_check"
-            ],
-            "trailing-period": args_dict["enable_trailing_period_check"],
-            "singleline-summary": args_dict["enable_singleline_summary_check"],
-            "signoff": args_dict["enable_signoff_check"],
-            "gpg": args_dict["enable_gpg_check"],
-            "regex": args_dict["enable_regex_check"],
-            "author-name-regex": args_dict["enable_author_name_regex_check"],
-            "author-email-regex": args_dict["enable_author_email_regex_check"],
-        },
-        "rules.settings": {
-            "min-length": args_dict["min_length"],
-            "max-length": args_dict["max_length"],
-            "capitalized-summary": args_dict["capitalized_summary"],
-            "trailing-period": args_dict["trailing_period"],
-            "singleline-summary": args_dict["singleline_summary"],
-            "signoff": args_dict["signoff"],
-            "gpg": args_dict["gpg"],
-            "regex": args_dict["regex"],
-            "author-name-regex": args_dict["author_name_regex"],
-            "author-email-regex": args_dict["author_email_regex"],
-        },
-        "main": {
-            "config": args_dict["config"],
-            "repository": args_dict["repository"],
-            "range": args_dict["range"],
-        },
+    return {
+        param: args_dict[param]
+        for param in args_dict
+        if args_dict[param] is not None
     }
-    cmd_args = {}
-    for section in cmd_args_parsed:
-        cmd_args[section] = {}
-        for param in cmd_args_parsed[section]:
-            if cmd_args_parsed[section][param] is not None:
-                cmd_args[section][param] = cmd_args_parsed[section][param]
-    return cmd_args
 
 
-def parse(cmd_args):
-    cmd_args = from_cmd_args_to_config(cmd_args)
+def merge(cmd_args):
+    result = DEFAULTS.copy()
+    _merge_fileconfig(
+        result, cmd_args["main"]["config"] or result["main"]["config"]
+    )
+    result.update(_from_cmd_args_to_config(cmd_args))
+    _validate(result)
+    return result
 
-    config = configparser.ConfigParser(interpolation=None)
-    config.read_dict(DEFAULTS)
-    config_filename = config["main"]["config"]
+
+def _merge_fileconfig(config, file_config_path):
+    file_config = configparser.ConfigParser(interpolation=None)
+    config_filename = file_config_path
     try:
         with open(config_filename) as config_fp:
-            config.read_file(config_fp)
+            file_config.read_file(config_fp)
     except OSError:
         print_error(f"Cannot open file {config_filename}")
         sys.exit(ERROR_EXIT_CODE)
-    config.read_dict(cmd_args)
-    validate(config)
-    return config
+    for section in config:
+        if section not in file_config.sections():
+            print_warning(f"Unknown config section {section}")
+            continue
+        for option in config[section]:
+            if option not in file_config.options(section):
+                print_warning(f"Unknown config option {section}:{option}")
+                continue
+            value = file_config[section][option]
+            try:
+                if option in _FILE_CONFIG_INT_OPTIONS:
+                    value = file_config[section].getint(option)
+                elif option in _FILE_CONFIG_BOOL_OPTIONS:
+                    value = file_config[section].getboolean(option)
+            except ValueError:
+                print_error(f"Cannot parse option {section}:{option}")
+                sys.exit(ERROR_EXIT_CODE)
+            config[section][option] = value
 
 
 def configure_logging(section):
@@ -163,7 +163,7 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--no-capitalized-summary",
-        dest="capitalized-summary",
+        dest="capitalized_summary",
         action="store_false",
         help="Not capitalized summary",
     )
@@ -175,7 +175,7 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--no-trailing-period",
-        dest="trailing-period",
+        dest="trailing_period",
         action="store_false",
         help="No trailing period (default)",
     )
@@ -187,7 +187,7 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--no-singleline-summary",
-        dest="singleline-summary",
+        dest="singleline_summary",
         action="store_false",
         help="Multiline summary",
     )
@@ -274,33 +274,12 @@ def configure_argparser(cmd_args_parser):
     )
 
 
-def _validate_bool(section, key):
-    try:
-        section.getboolean(key)
-    except ValueError:
-        print_error(f"Incorrect value for '{key}' param")
+def _validate(config):
+    if (
+        config["rules.settings"]["min_length"]
+        > config["rules.settings"]["max_length"]
+    ):
+        print_error(
+            "rules.settings.min_length is greater than rules.settings.max_length"
+        )
         sys.exit(ERROR_EXIT_CODE)
-
-
-def _validate_int(section, key):
-    try:
-        section.getint(key)
-    except ValueError:
-        print_error(f"Incorrect value for '{key}' param")
-        sys.exit(ERROR_EXIT_CODE)
-
-
-def validate(config):
-    for key in config["rules"]:
-        _validate_bool(config["rules"], key)
-    _validate_int(config["rules.settings"], "min-length")
-    _validate_int(config["rules.settings"], "max-length")
-    for key in [
-        "capitalized-summary",
-        "trailing-period",
-        "gpg",
-        "signoff",
-        "singleline-summary",
-    ]:
-        _validate_bool(config["rules.settings"], key)
-    _validate_bool(config["logging"], "enabled")
