@@ -15,5 +15,6 @@ python3 -m venv .venv
 . ./.venv/bin/activate
 pip install setuptools wheel
 pip install -e '.[dev]'
+python -m build
 ```
 
