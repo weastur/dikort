@@ -3,8 +3,6 @@ import json
 import urllib.error
 import urllib.request
 
-import colorama
-
 import dikort
 from dikort.analyzer import analyze_commits
 from dikort.config import configure_argparser, configure_logging, parse
@@ -33,7 +31,6 @@ def check_for_new_version():
 
 def main():  # pragma: nocover
     print("Welcome to dikort - the ultimate commit message check tool")
-    colorama.init()
     check_for_new_version()
 
     cmd_args_parser = argparse.ArgumentParser(
