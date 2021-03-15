@@ -5,15 +5,15 @@ from dikort.print import print_error, print_warning
 
 _FILE_CONFIG_INT_OPTIONS = ("min_length", "max_length")
 _FILE_CONFIG_BOOL_OPTIONS = (
-    "length",
-    "capitalized_summary",
-    "trailing_period",
-    "singleline_summary",
-    "signoff",
-    "gpg",
-    "regex",
-    "author_name_regex",
-    "author_email_regex",
+    "enable_length",
+    "enable_capitalized_summary",
+    "enable_trailing_period",
+    "enable_singleline_summary",
+    "enable_signoff",
+    "enable_gpg",
+    "enable_regex",
+    "enable_author_name_regex",
+    "enable_author_email_regex",
 )
 ERROR_EXIT_CODE = 128
 FAILED_EXIT_CODE = 1
@@ -74,6 +74,32 @@ def merge(cmd_args):
 
 def _merge_fileconfig(config, file_config_path):
     file_config = configparser.ConfigParser(interpolation=None)
+    _read_file_config(file_config, file_config_path)
+    for section in config:
+        if section not in file_config.sections():
+            continue
+        for option in config[section]:
+            if option not in file_config.options(section):
+                continue
+            config[section][option] = _parse_value_from_file(
+                file_config, option, section
+            )
+
+
+def _parse_value_from_file(file_config, option, section):
+    value = file_config[section][option]
+    try:
+        if option in _FILE_CONFIG_INT_OPTIONS:
+            value = file_config[section].getint(option)
+        elif option in _FILE_CONFIG_BOOL_OPTIONS:
+            value = file_config[section].getboolean(option)
+    except ValueError:
+        print_error(f"Cannot parse option {section}:{option}")
+        sys.exit(ERROR_EXIT_CODE)
+    return value
+
+
+def _read_file_config(file_config, file_config_path):
     config_filename = file_config_path
     try:
         with open(config_filename) as config_fp:
@@ -81,23 +107,17 @@ def _merge_fileconfig(config, file_config_path):
     except OSError:
         print_error(f"Cannot open file {config_filename}")
         sys.exit(ERROR_EXIT_CODE)
-    for section in config:
-        if section not in file_config.sections():
-            continue
-        for option in config[section]:
-            if option not in file_config.options(section):
-                print_warning(f"Unknown config option {section}:{option}")
-                continue
-            value = file_config[section][option]
-            try:
-                if option in _FILE_CONFIG_INT_OPTIONS:
-                    value = file_config[section].getint(option)
-                elif option in _FILE_CONFIG_BOOL_OPTIONS:
-                    value = file_config[section].getboolean(option)
-            except ValueError:
-                print_error(f"Cannot parse option {section}:{option}")
-                sys.exit(ERROR_EXIT_CODE)
-            config[section][option] = value
+
+
+def _validate(config):
+    if (
+        config["rules.settings"]["min_length"]
+        > config["rules.settings"]["max_length"]
+    ):
+        print_error(
+            "rules.settings.min_length is greater than rules.settings.max_length"
+        )
+        sys.exit(ERROR_EXIT_CODE)
 
 
 def configure_argparser(cmd_args_parser):
@@ -267,14 +287,3 @@ def configure_argparser(cmd_args_parser):
         nargs="?",
         help=f"Commit range (default: {DEFAULTS['main']['range']})",
     )
-
-
-def _validate(config):
-    if (
-        config["rules.settings"]["min_length"]
-        > config["rules.settings"]["max_length"]
-    ):
-        print_error(
-            "rules.settings.min_length is greater than rules.settings.max_length"
-        )
-        sys.exit(ERROR_EXIT_CODE)
