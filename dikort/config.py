@@ -66,9 +66,7 @@ def _from_cmd_args_to_config(cmd_args):
 
 def merge(cmd_args):
     result = DEFAULTS.copy()
-    _merge_fileconfig(
-        result, cmd_args["main"]["config"] or result["main"]["config"]
-    )
+    _merge_fileconfig(result, cmd_args.config or result["main"]["config"])
     result.update(_from_cmd_args_to_config(cmd_args))
     _validate(result)
     return result
@@ -85,7 +83,6 @@ def _merge_fileconfig(config, file_config_path):
         sys.exit(ERROR_EXIT_CODE)
     for section in config:
         if section not in file_config.sections():
-            print_warning(f"Unknown config section {section}")
             continue
         for option in config[section]:
             if option not in file_config.options(section):
@@ -105,16 +102,24 @@ def _merge_fileconfig(config, file_config_path):
 
 def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
-        "-c", "--config", help="Config file location (default: ./.dikort.cfg"
+        "-c",
+        "--config",
+        help=f"Config file location (default: {DEFAULTS['main']['config']}",
     )
     cmd_args_parser.add_argument(
-        "-r", "--repository", help="Repository location (default: ./)"
+        "-r",
+        "--repository",
+        help=f"Repository location (default: {DEFAULTS['main']['repository']})",
     )
     cmd_args_parser.add_argument(
-        "--min-length", type=int, help="Minimum commit length (default: 10)"
+        "--min-length",
+        type=int,
+        help=f"Minimum commit length (default: {DEFAULTS['rules.settings']['min_length']})",
     )
     cmd_args_parser.add_argument(
-        "--max-length", type=int, help="Maximum commit length (default: 50)"
+        "--max-length",
+        type=int,
+        help=f"Maximum commit length (default: {DEFAULTS['rules.settings']['max_length']})",
     )
     cmd_args_parser.add_argument(
         "--regex", help="Regex to check commit message summary"
@@ -127,7 +132,7 @@ def configure_argparser(cmd_args_parser):
     )
     cmd_args_parser.add_argument(
         "--enable-logging",
-        help="Enable logs output to stderr (default: False)",
+        help=f"Enable logs output to stderr (default: {DEFAULTS['logging']['enabled']})",
         default=None,
         action="store_true",
     )
@@ -147,7 +152,7 @@ def configure_argparser(cmd_args_parser):
         "--capitalized-summary",
         default=None,
         action="store_true",
-        help="Capitalized summary (default)",
+        help=f"Capitalized summary (default: {DEFAULTS['rules.settings']['capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--no-capitalized-summary",
@@ -165,13 +170,13 @@ def configure_argparser(cmd_args_parser):
         "--no-trailing-period",
         dest="trailing_period",
         action="store_false",
-        help="No trailing period (default)",
+        help=f"No trailing period (default: {DEFAULTS['rules.settings']['trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--singleline-summary",
         default=None,
         action="store_true",
-        help="Singleline summary (default)",
+        help=f"Singleline summary (default: {DEFAULTS['rules.settings']['singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--no-singleline-summary",
@@ -183,7 +188,7 @@ def configure_argparser(cmd_args_parser):
         "--signoff",
         default=None,
         action="store_true",
-        help="Presence of signoff (default)",
+        help=f"Presence of signoff (default: {DEFAULTS['rules.settings']['signoff']})",
     )
     cmd_args_parser.add_argument(
         "--no-signoff",
@@ -195,7 +200,7 @@ def configure_argparser(cmd_args_parser):
         "--gpg",
         default=None,
         action="store_true",
-        help="Presence of GPG sign (default)",
+        help=f"Presence of GPG sign (default: {DEFAULTS['rules.settings']['gpg']})",
     )
     cmd_args_parser.add_argument(
         "--no-gpg",
@@ -207,58 +212,60 @@ def configure_argparser(cmd_args_parser):
         "--enable-length-check",
         action="store_true",
         default=None,
-        help="Enable length check (default: True)",
+        help=f"Enable length check (default: {DEFAULTS['rules']['length']})",
     )
     cmd_args_parser.add_argument(
         "--enable-capitalized-summary-check",
         action="store_true",
         default=None,
-        help="Enable capitalized summary check (default: True)",
+        help=f"Enable capitalized summary check (default: {DEFAULTS['rules']['capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-trailing-period-check",
         action="store_true",
         default=None,
-        help="Enable trailing period check (default: True)",
+        help=f"Enable trailing period check (default: {DEFAULTS['rules']['trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--enable-singleline-summary-check",
         action="store_true",
         default=None,
-        help="Enable single line summary check (default: True)",
+        help=f"Enable single line summary check (default: {DEFAULTS['rules']['singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-signoff-check",
         action="store_true",
         default=None,
-        help="Enable checking for signoff (default: False)",
+        help=f"Enable checking for signoff (default: {DEFAULTS['rules']['signoff']})",
     )
     cmd_args_parser.add_argument(
         "--enable-gpg-check",
         action="store_true",
         default=None,
-        help="Enable checking for GPG sign (default: False)",
+        help=f"Enable checking for GPG sign (default: {DEFAULTS['rules']['gpg']})",
     )
     cmd_args_parser.add_argument(
         "--enable-regex-check",
         action="store_true",
         default=None,
-        help="Enable check by regex (default: False)",
+        help=f"Enable check by regex (default: {DEFAULTS['rules']['regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-author-name-regex-check",
         action="store_true",
         default=None,
-        help="Enable author name check by regex (default: False)",
+        help=f"Enable author name check by regex (default: {DEFAULTS['rules']['author_name_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-author-email-regex-check",
         action="store_true",
         default=None,
-        help="Enable author email check by regex (default: False)",
+        help=f"Enable author email check by regex (default: {DEFAULTS['rules']['author_email_regex']})",
     )
     cmd_args_parser.add_argument(
-        "range", nargs="?", help="Commit range (default: HEAD)"
+        "range",
+        nargs="?",
+        help=f"Commit range (default: {DEFAULTS['main']['range']})",
     )
 
 
