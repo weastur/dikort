@@ -33,6 +33,7 @@ setup(
     license=module.__license__,
     description=module.__doc__,
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/weastur/dikort",
     classifiers=[
         "Development Status :: 1 - Planning",

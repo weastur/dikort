@@ -41,9 +41,7 @@ class TestFilters(TestCase):
             filter_trailing_period(self.commit, config=self.config)
         )
         self.config["rules.settings"]["trailing-period"] = "yes"
-        self.assertTrue(
-            filter_trailing_period(self.commit, config=self.config)
-        )
+        self.assertTrue(filter_trailing_period(self.commit, config=self.config))
 
         self.commit.summary = "Trailing period summary\n"
         self.config["rules.settings"]["trailing-period"] = "no"
@@ -51,9 +49,7 @@ class TestFilters(TestCase):
             filter_trailing_period(self.commit, config=self.config)
         )
         self.config["rules.settings"]["trailing-period"] = "yes"
-        self.assertTrue(
-            filter_trailing_period(self.commit, config=self.config)
-        )
+        self.assertTrue(filter_trailing_period(self.commit, config=self.config))
 
     def test_capitalized_summary(self):
         self.commit.summary = "Capitalized summary\n"
