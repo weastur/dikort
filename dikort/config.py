@@ -1,4 +1,5 @@
 import configparser
+import re
 import sys
 
 from dikort.print import print_error, print_warning
@@ -19,7 +20,7 @@ _FILE_CONFIG_BOOL_OPTIONS = (
     "singleline_summary",
     "signoff",
     "gpg",
-    "enabled"
+    "enabled",
 )
 ERROR_EXIT_CODE = 128
 FAILED_EXIT_CODE = 1
@@ -75,6 +76,7 @@ def merge(cmd_args):
     _merge_fileconfig(result, cmd_args.config or result["main"]["config"])
     result.update(_from_cmd_args_to_config(cmd_args))
     _validate(result)
+    _post_processing(result)
     return result
 
 
@@ -124,6 +126,18 @@ def _validate(config):
             "rules.settings.min_length is greater than rules.settings.max_length"
         )
         sys.exit(ERROR_EXIT_CODE)
+
+
+def _post_processing(config):
+    config["rules.settings"]["regex"] = re.compile(
+        config["rules.settings"]["regex"]
+    )
+    config["rules.settings"]["author_name_regex"] = re.compile(
+        config["rules.settings"]["author_name_regex"]
+    )
+    config["rules.settings"]["author_email_regex"] = re.compile(
+        config["rules.settings"]["author_email_regex"]
+    )
 
 
 def configure_argparser(cmd_args_parser):

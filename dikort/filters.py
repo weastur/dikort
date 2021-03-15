@@ -1,5 +1,4 @@
 import logging
-import re
 
 
 def filter_singleline(commit, *, config):
@@ -48,9 +47,10 @@ def filter_length(commit, *, config):
 
 def filter_signoff(commit, *, config):
     last_msg_line = commit.message.rstrip().split("\n")[-1]
-    if last_msg_line.startswith("Signed-off-by") != config[
-        "rules.settings"
-    ]["signoff"]:
+    if (
+        last_msg_line.startswith("Signed-off-by")
+        != config["rules.settings"]["signoff"]
+    ):
         return True
     return False
 
@@ -64,23 +64,24 @@ def filter_gpg(commit, *, config):
 
 def filter_regex(commit, *, config):
     logging.debug("Check %s commit for regex", commit.hexsha)
-    regex = re.compile(config["rules.settings"]["regex"])
-    if not regex.match(commit.summary):
+    if not config["rules.settings"]["regex"].match(commit.summary):
         return True
     return False
 
 
 def filter_author_name_regex(commit, *, config):
     logging.debug("Check %s commit for author name", commit.hexsha)
-    regex = re.compile(config["rules.settings"]["author_name_regex"])
-    if not regex.match(commit.author.name):
+    if not config["rules.settings"]["author_name_regex"].match(
+        commit.author.name
+    ):
         return True
     return False
 
 
 def filter_author_email_regex(commit, *, config):
     logging.debug("Check %s commit for author email", commit.hexsha)
-    regex = re.compile(config["rules.settings"]["author_email_regex"])
-    if not regex.match(commit.author.email):
+    if not config["rules.settings"]["author_email_regex"].match(
+        commit.author.email
+    ):
         return True
     return False
