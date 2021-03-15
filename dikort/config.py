@@ -14,6 +14,12 @@ _FILE_CONFIG_BOOL_OPTIONS = (
     "enable_regex",
     "enable_author_name_regex",
     "enable_author_email_regex",
+    "capitalized_summary",
+    "trailing_period",
+    "singleline_summary",
+    "signoff",
+    "gpg",
+    "enabled"
 )
 ERROR_EXIT_CODE = 128
 FAILED_EXIT_CODE = 1

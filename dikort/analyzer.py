@@ -25,15 +25,15 @@ RULES = {
         "filter": filter_length,
     },
     "Trailing period": {
-        "param": "trailing-period",
+        "param": "trailing_period",
         "filter": filter_trailing_period,
     },
     "Capitalized summary": {
-        "param": "capitalized-summary",
+        "param": "capitalized_summary",
         "filter": filter_capitalized,
     },
     "Signle line summary": {
-        "param": "singleline-summary",
+        "param": "singleline_summary",
         "filter": filter_singleline,
     },
     "Signoff": {
@@ -49,11 +49,11 @@ RULES = {
         "filter": filter_regex,
     },
     "Author name regex": {
-        "param": "author-name-regex",
+        "param": "author_name_regex",
         "filter": filter_author_name_regex,
     },
     "Author email regex": {
-        "param": "author-email-regex",
+        "param": "author_email_regex",
         "filter": filter_author_email_regex,
     },
 }
@@ -83,7 +83,7 @@ def analyze_commits(config):
         sys.exit(ERROR_EXIT_CODE)
     all_clear = True
     for rule in RULES:
-        if not config["rules"].getboolean(RULES[rule]["param"]):
+        if not config["rules"][RULES[rule]["param"]]:
             logging.info("Rule '%s' disabled. Skip.", rule)
             continue
         logging.debug("Rule '%s' enabled. Start.", rule)
