@@ -2,7 +2,7 @@ import logging
 import re
 
 
-def _filter_singleline(commit, *, config):
+def filter_singleline(commit, *, config):
     logging.debug("Check %s commit for singleline", commit.hexsha)
     summary_lines_count = commit.summary.count("\n")
     singleline_summary = config["rules.settings"].getboolean(
@@ -18,7 +18,7 @@ def _filter_singleline(commit, *, config):
     return False
 
 
-def _filter_trailing_period(commit, *, config):
+def filter_trailing_period(commit, *, config):
     logging.debug("Check %s commit for trailing period", commit.hexsha)
     summary = commit.summary
     if summary.endswith(".") != config["rules.settings"].getboolean(
@@ -28,7 +28,7 @@ def _filter_trailing_period(commit, *, config):
     return False
 
 
-def _filter_capitalized(commit, *, config):
+def filter_capitalized(commit, *, config):
     logging.debug("Check %s commit for capitalized subject", commit.hexsha)
     summary_first_letter = commit.summary[0]
     if (
@@ -40,7 +40,7 @@ def _filter_capitalized(commit, *, config):
     return False
 
 
-def _filter_length(commit, *, config):
+def filter_length(commit, *, config):
     logging.debug("Check %s commit for summary message length", commit.hexsha)
     min_length = config["rules.settings"].getint("min-length")
     max_length = config["rules.settings"].getint("max-length")
@@ -50,7 +50,7 @@ def _filter_length(commit, *, config):
     return False
 
 
-def _filter_signoff(commit, *, config):
+def filter_signoff(commit, *, config):
     last_msg_line = commit.message.rstrip().split("\n")[-1]
     if last_msg_line.startswith("Signed-off-by") != config[
         "rules.settings"
@@ -59,14 +59,14 @@ def _filter_signoff(commit, *, config):
     return False
 
 
-def _filter_gpg(commit, *, config):
+def filter_gpg(commit, *, config):
     logging.debug("Check %s commit for GPG sign", commit.hexsha)
     if bool(commit.gpgsig) != config["rules.settings"].getboolean("gpg"):
         return True
     return False
 
 
-def _filter_regex(commit, *, config):
+def filter_regex(commit, *, config):
     logging.debug("Check %s commit for regex", commit.hexsha)
     regex = re.compile(config["rules.settings"].get("regex"))
     if not regex.match(commit.summary):
@@ -74,7 +74,7 @@ def _filter_regex(commit, *, config):
     return False
 
 
-def _filter_author_name_regex(commit, *, config):
+def filter_author_name_regex(commit, *, config):
     logging.debug("Check %s commit for author name", commit.hexsha)
     regex = re.compile(config["rules.settings"].get("author-name-regex"))
     if not regex.match(commit.author.name):
@@ -82,7 +82,7 @@ def _filter_author_name_regex(commit, *, config):
     return False
 
 
-def _filter_author_email_regex(commit, *, config):
+def filter_author_email_regex(commit, *, config):
     logging.debug("Check %s commit for author email", commit.hexsha)
     regex = re.compile(config["rules.settings"].get("author-email-regex"))
     if not regex.match(commit.author.email):

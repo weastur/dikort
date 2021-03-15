@@ -7,54 +7,54 @@ from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 
 from dikort.config import ERROR_EXIT_CODE, FAILED_EXIT_CODE
 from dikort.filters import (
-    _filter_author_email_regex,
-    _filter_author_name_regex,
-    _filter_capitalized,
-    _filter_gpg,
-    _filter_length,
-    _filter_regex,
-    _filter_signoff,
-    _filter_singleline,
-    _filter_trailing_period,
+    filter_author_email_regex,
+    filter_author_name_regex,
+    filter_capitalized,
+    filter_gpg,
+    filter_length,
+    filter_regex,
+    filter_signoff,
+    filter_singleline,
+    filter_trailing_period,
 )
 from dikort.print import print_error, print_success
 
 RULES = {
     "Summary length": {
         "param": "length",
-        "filter": _filter_length,
+        "filter": filter_length,
     },
     "Trailing period": {
         "param": "trailing-period",
-        "filter": _filter_trailing_period,
+        "filter": filter_trailing_period,
     },
     "Capitalized summary": {
         "param": "capitalized-summary",
-        "filter": _filter_capitalized,
+        "filter": filter_capitalized,
     },
     "Signle line summary": {
         "param": "singleline-summary",
-        "filter": _filter_singleline,
+        "filter": filter_singleline,
     },
     "Signoff": {
         "param": "signoff",
-        "filter": _filter_signoff,
+        "filter": filter_signoff,
     },
     "GPG": {
         "param": "gpg",
-        "filter": _filter_gpg,
+        "filter": filter_gpg,
     },
     "Regex": {
         "param": "regex",
-        "filter": _filter_regex,
+        "filter": filter_regex,
     },
     "Author name regex": {
         "param": "author-name-regex",
-        "filter": _filter_author_name_regex,
+        "filter": filter_author_name_regex,
     },
     "Author email regex": {
         "param": "author-email-regex",
-        "filter": _filter_author_email_regex,
+        "filter": filter_author_email_regex,
     },
 }
 
