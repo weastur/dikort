@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import urllib.error
 import urllib.request
 
@@ -32,13 +33,19 @@ def check_for_new_version():
 def main():  # pragma: nocover
     print("Welcome to dikort - the ultimate commit message check tool")
     check_for_new_version()
-
     cmd_args_parser = argparse.ArgumentParser(
         prog="dikort", description="Commit messages checking tool"
     )
     configure_argparser(cmd_args_parser)
     config = merge(cmd_args_parser.parse_args())
-    configure_logging(config["logging"])
+    logging_config = {
+        "format": config["logging"]["format"],
+        "level": config["logging"]["level"],
+        "datefmt": config["logging"]["datefmt"],
+    }
+    if not config["logging"]["enabled"]:
+        logging_config["handlers"] = [logging.NullHandler()]
+    logging.basicConfig(**logging_config)
     analyze_commits(config)
 
 

@@ -1,5 +1,4 @@
 import configparser
-import logging
 import sys
 
 from dikort.print import print_error, print_warning
@@ -102,17 +101,6 @@ def _merge_fileconfig(config, file_config_path):
                 print_error(f"Cannot parse option {section}:{option}")
                 sys.exit(ERROR_EXIT_CODE)
             config[section][option] = value
-
-
-def configure_logging(section):
-    logging_config = {
-        "format": section["format"],
-        "level": section["level"],
-        "datefmt": section["datefmt"],
-    }
-    if not section.getboolean("enabled"):
-        logging_config["handlers"] = [logging.NullHandler()]
-    logging.basicConfig(**logging_config)
 
 
 def configure_argparser(cmd_args_parser):
