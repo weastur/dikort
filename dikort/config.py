@@ -1,4 +1,5 @@
 import configparser
+import copy
 import re
 import sys
 
@@ -100,14 +101,15 @@ def _from_cmd_args_to_config(cmd_args):
 
 
 def merge(cmd_args):
-    result = DEFAULTS.copy()
-    _merge_fileconfig(result, vars(cmd_args)["main:config"] or result["main"]["config"])
+    result = copy.deepcopy(DEFAULTS)
+    _merge_fileconfig(
+        result, vars(cmd_args)["main:config"] or result["main"]["config"]
+    )
     config_from_cmdline = _from_cmd_args_to_config(cmd_args)
     for section in result:
         if section not in config_from_cmdline:
             continue
         result[section].update(config_from_cmdline[section])
-    result.update()
     _validate(result)
     _post_processing(result)
     return result
@@ -163,6 +165,14 @@ def _validate(config):
             "rules.settings.min_length is greater than rules.settings.max_length"
         )
         sys.exit(ERROR_EXIT_CODE)
+    if (
+        config["merge_rules.settings"]["min_length"]
+        > config["merge_rules.settings"]["max_length"]
+    ):
+        print_error(
+            "merge_rules.settings.min_length is greater than merge_rules.settings.max_length"
+        )
+        sys.exit(ERROR_EXIT_CODE)
 
 
 def _post_processing(config):
@@ -174,6 +184,15 @@ def _post_processing(config):
     )
     config["rules.settings"]["author_email_regex"] = re.compile(
         config["rules.settings"]["author_email_regex"]
+    )
+    config["merge_rules.settings"]["regex"] = re.compile(
+        config["merge_rules.settings"]["regex"]
+    )
+    config["merge_rules.settings"]["author_name_regex"] = re.compile(
+        config["merge_rules.settings"]["author_name_regex"]
+    )
+    config["merge_rules.settings"]["author_email_regex"] = re.compile(
+        config["merge_rules.settings"]["author_email_regex"]
     )
 
 
