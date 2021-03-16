@@ -87,17 +87,29 @@ DEFAULTS = {
 
 def _from_cmd_args_to_config(cmd_args):
     args_dict = vars(cmd_args)
-    return {
+    filtered_dict = {
         param: args_dict[param]
         for param in args_dict
         if args_dict[param] is not None
     }
+    result = {}
+    for section in DEFAULTS:
+        for option in DEFAULTS[section]:
+            if option not in filtered_dict:
+                continue
+            result.setdefault(section, {})[option] = filtered_dict[option]
+    return result
 
 
 def merge(cmd_args):
     result = DEFAULTS.copy()
     _merge_fileconfig(result, cmd_args.config or result["main"]["config"])
-    result.update(_from_cmd_args_to_config(cmd_args))
+    config_from_cmdline = _from_cmd_args_to_config(cmd_args)
+    for section in result:
+        if section not in config_from_cmdline:
+            continue
+        result[section].update(config_from_cmdline[section])
+    result.update()
     _validate(result)
     _post_processing(result)
     return result
