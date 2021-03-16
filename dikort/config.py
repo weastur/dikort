@@ -147,6 +147,10 @@ def _read_file_config(file_config, file_config_path):
     try:
         with open(config_filename) as config_fp:
             file_config.read_file(config_fp)
+    except FileNotFoundError:
+        if file_config_path != DEFAULTS["main"]["config"]:
+            print_error(f"Cannot open file {config_filename}")
+            sys.exit(ERROR_EXIT_CODE)
     except OSError:
         print_error(f"Cannot open file {config_filename}")
         sys.exit(ERROR_EXIT_CODE)
