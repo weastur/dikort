@@ -138,7 +138,8 @@ def analyze_commits(config):
             logging.debug("Rule '%s' enabled. Start.", rule)
             print(f"[{rule}] - ", end="")
             predicate = functools.partial(
-                rules["checks"][rule]["filter"], config=config
+                rules["checks"][rule]["filter"],
+                config=config[f"{params_section}.settings"],
             )
             failed_commits = _generic_check(
                 repo.iter_commits(rev=config["main"]["range"]),
