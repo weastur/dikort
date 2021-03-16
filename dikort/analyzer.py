@@ -99,8 +99,8 @@ MERGE_RULES = {
 }
 
 
-def _generic_check(commit_range, predicate, merge_commits):
-    desired_parents_count = 2 if merge_commits else 1
+def _generic_check(commit_range, predicate, check_merge_commits):
+    desired_parents_count = 2 if check_merge_commits else 1
     try:
         return list(
             filter(
@@ -118,15 +118,9 @@ def _generic_check(commit_range, predicate, merge_commits):
 
 def analyze_commits(config):
     logging.info("Start checks")
-    repository_path = config["main"]["repository"]
-    logging.debug("Open repo at %s", repository_path)
-    try:
-        repo = Repo(repository_path)
-    except (NoSuchPathError, InvalidGitRepositoryError) as err:
-        print_error(f"Cannot open git repo at {repository_path}. Error: {err}")
-        sys.exit(ERROR_EXIT_CODE)
+    repo = _open_repository(config)
     all_clear = True
-    for (rules, merge_commits) in [(RULES, False), (MERGE_RULES, True)]:
+    for (rules, check_merge_commits) in [(RULES, False), (MERGE_RULES, True)]:
         for rule in rules:
             if not config["rules"][rules[rule]["param"]]:
                 logging.info("Rule '%s' disabled. Skip.", rule)
@@ -134,25 +128,27 @@ def analyze_commits(config):
             logging.debug("Rule '%s' enabled. Start.", rule)
             print(f"[{rule}] - ", end="")
             predicate = functools.partial(rules[rule]["filter"], config=config)
-            failed = _generic_check(
+            failed_commits = _generic_check(
                 repo.iter_commits(rev=config["main"]["range"]),
                 predicate,
-                merge_commits,
+                check_merge_commits,
             )
-            if failed:
-                print_error("ERROR")
-                all_clear = False
-                logging.info(
-                    "Failed %d commit for '%s' rule", len(failed), rule
-                )
-                for commit in failed:
-                    logging.debug(
-                        "Hash: %s, message: '%s'", commit.hexsha, commit.summary
-                    )
-                    print(f"Hash: {commit.hexsha}, message: '{commit.summary}'")
-            else:
-                logging.info("Errors not found for rule '%s'", rule)
-                print_success("SUCCESS")
+            all_clear = _process_failed_commits(all_clear, failed_commits, rule)
+    _finish(all_clear)
+
+
+def _open_repository(config):
+    repository_path = config["main"]["repository"]
+    logging.debug("Open repo at %s", repository_path)
+    try:
+        repo = Repo(repository_path)
+    except (NoSuchPathError, InvalidGitRepositoryError) as err:
+        print_error(f"Cannot open git repo at {repository_path}. Error: {err}")
+        sys.exit(ERROR_EXIT_CODE)
+    return repo
+
+
+def _finish(all_clear):
     if all_clear:
         logging.info("All clear.")
         print_success("All clear.")
@@ -161,3 +157,21 @@ def analyze_commits(config):
         logging.info("Some checks are failed.")
         logging.info("Exit with state %d", FAILED_EXIT_CODE)
         sys.exit(FAILED_EXIT_CODE)
+
+
+def _process_failed_commits(all_clear, failed_commits, rule):
+    if failed_commits:
+        print_error("ERROR")
+        all_clear = False
+        logging.info(
+            "Failed %d commit for '%s' rule", len(failed_commits), rule
+        )
+        for commit in failed_commits:
+            logging.debug(
+                "Hash: %s, message: '%s'", commit.hexsha, commit.summary
+            )
+            print(f"Hash: {commit.hexsha}, message: '{commit.summary}'")
+    else:
+        logging.info("Errors not found for rule '%s'", rule)
+        print_success("SUCCESS")
+    return all_clear
