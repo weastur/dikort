@@ -20,81 +20,89 @@ from dikort.filters import (
 from dikort.print import print_error, print_success
 
 RULES = {
-    "Summary length": {
-        "param": "length",
-        "filter": filter_length,
-    },
-    "Trailing period": {
-        "param": "trailing_period",
-        "filter": filter_trailing_period,
-    },
-    "Capitalized summary": {
-        "param": "capitalized_summary",
-        "filter": filter_capitalized,
-    },
-    "Signle line summary": {
-        "param": "singleline_summary",
-        "filter": filter_singleline,
-    },
-    "Signoff": {
-        "param": "signoff",
-        "filter": filter_signoff,
-    },
-    "GPG": {
-        "param": "gpg",
-        "filter": filter_gpg,
-    },
-    "Regex": {
-        "param": "regex",
-        "filter": filter_regex,
-    },
-    "Author name regex": {
-        "param": "author_name_regex",
-        "filter": filter_author_name_regex,
-    },
-    "Author email regex": {
-        "param": "author_email_regex",
-        "filter": filter_author_email_regex,
+    "params_section": "rules",
+    "check_merge_commits": False,
+    "checks": {
+        "Summary length": {
+            "param": "length",
+            "filter": filter_length,
+        },
+        "Trailing period": {
+            "param": "trailing_period",
+            "filter": filter_trailing_period,
+        },
+        "Capitalized summary": {
+            "param": "capitalized_summary",
+            "filter": filter_capitalized,
+        },
+        "Signle line summary": {
+            "param": "singleline_summary",
+            "filter": filter_singleline,
+        },
+        "Signoff": {
+            "param": "signoff",
+            "filter": filter_signoff,
+        },
+        "GPG": {
+            "param": "gpg",
+            "filter": filter_gpg,
+        },
+        "Regex": {
+            "param": "regex",
+            "filter": filter_regex,
+        },
+        "Author name regex": {
+            "param": "author_name_regex",
+            "filter": filter_author_name_regex,
+        },
+        "Author email regex": {
+            "param": "author_email_regex",
+            "filter": filter_author_email_regex,
+        },
     },
 }
 
 
 MERGE_RULES = {
-    "Summary length (merge commits)": {
-        "param": "length",
-        "filter": filter_length,
-    },
-    "Trailing period (merge commits)": {
-        "param": "trailing_period",
-        "filter": filter_trailing_period,
-    },
-    "Capitalized summary (merge commits)": {
-        "param": "capitalized_summary",
-        "filter": filter_capitalized,
-    },
-    "Signle line summary (merge commits)": {
-        "param": "singleline_summary",
-        "filter": filter_singleline,
-    },
-    "Signoff (merge commits)": {
-        "param": "signoff",
-        "filter": filter_signoff,
-    },
-    "GPG (merge commits)": {
-        "param": "gpg",
-        "filter": filter_gpg,
-    },
-    "Regex (merge commits)": {
-        "param": "regex",
-        "filter": filter_regex,
-    },
-    "Author name regex (merge commits)": {
-        "param": "author_name_regex",
-        "filter": filter_author_name_regex,
-    },
-    "Author email regex (merge commits)": {
-        "param": "author_email_regex",
-        "filter": filter_author_email_regex,
+    "params_section": "merge_rules",
+    "check_merge_commits": True,
+    "checks": {
+        "Summary length (merge commits)": {
+            "param": "length",
+            "filter": filter_length,
+        },
+        "Trailing period (merge commits)": {
+            "param": "trailing_period",
+            "filter": filter_trailing_period,
+        },
+        "Capitalized summary (merge commits)": {
+            "param": "capitalized_summary",
+            "filter": filter_capitalized,
+        },
+        "Signle line summary (merge commits)": {
+            "param": "singleline_summary",
+            "filter": filter_singleline,
+        },
+        "Signoff (merge commits)": {
+            "param": "signoff",
+            "filter": filter_signoff,
+        },
+        "GPG (merge commits)": {
+            "param": "gpg",
+            "filter": filter_gpg,
+        },
+        "Regex (merge commits)": {
+            "param": "regex",
+            "filter": filter_regex,
+        },
+        "Author name regex (merge commits)": {
+            "param": "author_name_regex",
+            "filter": filter_author_name_regex,
+        },
+        "Author email regex (merge commits)": {
+            "param": "author_email_regex",
+            "filter": filter_author_email_regex,
+        },
     },
 }
 
@@ -120,18 +128,22 @@ def analyze_commits(config):
     logging.info("Start checks")
     repo = _open_repository(config)
     all_clear = True
-    for (rules, check_merge_commits) in [(RULES, False), (MERGE_RULES, True)]:
-        for rule in rules:
-            if not config["rules"][rules[rule]["param"]]:
+    for rules in [RULES, MERGE_RULES]:
+        params_section = rules["params_section"]
+        for rule in rules["checks"]:
+            param_name = rules["checks"][rule]["param"]
+            if not config[params_section][param_name]:
                 logging.info("Rule '%s' disabled. Skip.", rule)
                 continue
             logging.debug("Rule '%s' enabled. Start.", rule)
             print(f"[{rule}] - ", end="")
-            predicate = functools.partial(rules[rule]["filter"], config=config)
+            predicate = functools.partial(
+                rules["checks"][rule]["filter"], config=config
+            )
             failed_commits = _generic_check(
                 repo.iter_commits(rev=config["main"]["range"]),
                 predicate,
-                check_merge_commits,
+                rules["check_merge_commits"],
             )
             all_clear = _process_failed_commits(all_clear, failed_commits, rule)
     _finish(all_clear)
