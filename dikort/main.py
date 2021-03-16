@@ -7,7 +7,7 @@ import urllib.request
 import dikort
 from dikort.analyzer import analyze_commits
 from dikort.config import configure_argparser, merge
-from dikort.print import print_warning
+from dikort.print import print_header, print_warning
 
 GITHUB_RELEASES_API_URL = "https://api.github.com/repos/weastur/dikort/releases"
 
@@ -31,7 +31,7 @@ def check_for_new_version():
 
 
 def main():  # pragma: nocover
-    print("Welcome to dikort - the ultimate commit message check tool")
+    print_header("Welcome to dikort - the ultimate commit message check tool")
     check_for_new_version()
     cmd_args_parser = argparse.ArgumentParser(
         prog="dikort", description="Commit messages checking tool"

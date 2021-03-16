@@ -10,16 +10,22 @@ class BColors:
     UNDERLINE = "\033[4m"
 
 
+def print_header(*args, sep=" ", end="\n"):
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.HEADER)
+
+
 def print_error(*args, sep=" ", end="\n"):
-    line = sep.join(args)
-    print(f"{BColors.FAIL}{line}{BColors.ENDC}", end=end)
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.FAIL)
 
 
 def print_warning(*args, sep=" ", end="\n"):
-    line = sep.join(args)
-    print(f"{BColors.WARNING}{line}{BColors.ENDC}", end=end)
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.WARNING)
 
 
 def print_success(*args, sep=" ", end="\n"):
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.OKGREEN)
+
+
+def _print_formatted(*args, sep=" ", end="\n", formatter=None):
     line = sep.join(args)
-    print(f"{BColors.OKGREEN}{line}{BColors.ENDC}", end=end)
+    print(f"{formatter}{line}{BColors.ENDC}", end=end)
