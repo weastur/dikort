@@ -146,7 +146,9 @@ def analyze_commits(config):
                 predicate,
                 rules["check_merge_commits"],
             )
-            all_clear = _process_failed_commits(all_clear, failed_commits, rule)
+            all_clear = all_clear and _process_failed_commits(
+                failed_commits, rule
+            )
     _finish(all_clear)
 
 
@@ -154,11 +156,10 @@ def _open_repository(config):
     repository_path = config["main"]["repository"]
     logging.debug("Open repo at %s", repository_path)
     try:
-        repo = Repo(repository_path)
+        return Repo(repository_path)
     except (NoSuchPathError, InvalidGitRepositoryError) as err:
         print_error(f"Cannot open git repo at {repository_path}. Error: {err}")
         sys.exit(ERROR_EXIT_CODE)
-    return repo
 
 
 def _finish(all_clear):
@@ -172,7 +173,8 @@ def _finish(all_clear):
         sys.exit(FAILED_EXIT_CODE)
 
 
-def _process_failed_commits(all_clear, failed_commits, rule):
+def _process_failed_commits(failed_commits, rule):
+    all_clear = True
     if failed_commits:
         print_error("ERROR")
         all_clear = False
