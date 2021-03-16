@@ -182,12 +182,14 @@ def configure_argparser(cmd_args_parser):
         "-c",
         "--config",
         dest="main:config",
+        metavar="PATH",
         help=f"Config file location (default: {DEFAULTS['main']['config']}",
     )
     cmd_args_parser.add_argument(
         "-r",
         "--repository",
         dest="main:repository",
+        metavar="PATH",
         help=f"Repository location (default: {DEFAULTS['main']['repository']})",
     )
     cmd_args_parser.add_argument(
@@ -200,20 +202,24 @@ def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
         "--logging-format",
         dest="logging:format",
+        metavar="STR",
         help="Format string for logging (Python style)",
     )
     cmd_args_parser.add_argument(
         "--logging-datefmt",
         dest="logging:datefmt",
+        metavar="STR",
         help="Format string for logging datetime (Python style)",
     )
     cmd_args_parser.add_argument(
         "--logging-level",
         dest="logging:level",
+        metavar="STR",
         help="Logging level (Python style)",
     )
     cmd_args_parser.add_argument(
         "--min-length",
+        metavar="INT",
         dest="rules.settings:min_length",
         type=int,
         help=f"Minimum commit length (default: {DEFAULTS['rules.settings']['min_length']})",
@@ -221,21 +227,25 @@ def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
         "--max-length",
         dest="rules.settings:max_length",
+        metavar="STR",
         type=int,
         help=f"Maximum commit length (default: {DEFAULTS['rules.settings']['max_length']})",
     )
     cmd_args_parser.add_argument(
         "--regex",
+        metavar="STR",
         help="Regex to check commit message summary",
         dest="rules.settings:regex",
     )
     cmd_args_parser.add_argument(
         "--author-name-regex",
+        metavar="STR",
         help="Regex to check author name",
         dest="rules.settings:author_name_regex",
     )
     cmd_args_parser.add_argument(
         "--author-email-regex",
+        metavar="STR",
         help="Regex to check author email",
         dest="rules.settings:author_email_regex",
     )
@@ -370,27 +380,32 @@ def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
         "--merge-min-length",
         type=int,
+        metavar="INT",
         dest="merge_rules.settings:min_length",
         help=f"Minimum commit length (default: {DEFAULTS['merge_rules.settings']['min_length']})",
     )
     cmd_args_parser.add_argument(
         "--merge-max-length",
         type=int,
+        metavar="INT",
         dest="merge_rules.settings:max_length",
         help=f"Maximum commit length (default: {DEFAULTS['merge_rules.settings']['max_length']})",
     )
     cmd_args_parser.add_argument(
         "--merge-regex",
+        metavar="STR",
         help="Regex to check commit message summary",
         dest="merge_rules.settings:regex",
     )
     cmd_args_parser.add_argument(
         "--merge-author-name-regex",
+        metavar="STR",
         help="Regex to check author name",
         dest="merge_rules.settings:author_name_regex",
     )
     cmd_args_parser.add_argument(
         "--merge-author-email-regex",
+        metavar="STR",
         help="Regex to check author email",
         dest="merge_rules.settings:author_email_regex",
     )
