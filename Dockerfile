@@ -1,12 +1,6 @@
-FROM alpine:3.13.2
+FROM python:3.9.2-alpine3.13
 
-RUN --mount=source=.,target=/dikort \
-    cd /dikort / \
-    && apk add --no-cache \
-        python3 \
-        py-pip \
-        git \
-    && pip3 install . \
-    && apk del py-pip
+RUN apk add --no-cache git \
+    && pip3 install dikort
 
-CMD ["dikort"]
+ENTRYPOINT ["dikort"]
