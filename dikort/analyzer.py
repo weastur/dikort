@@ -59,12 +59,56 @@ RULES = {
 }
 
 
-def _generic_check(commit_range, predicate):
+MERGE_RULES = {
+    "Summary length (merge commits)": {
+        "param": "length",
+        "filter": filter_length,
+    },
+    "Trailing period (merge commits)": {
+        "param": "trailing_period",
+        "filter": filter_trailing_period,
+    },
+    "Capitalized summary (merge commits)": {
+        "param": "capitalized_summary",
+        "filter": filter_capitalized,
+    },
+    "Signle line summary (merge commits)": {
+        "param": "singleline_summary",
+        "filter": filter_singleline,
+    },
+    "Signoff (merge commits)": {
+        "param": "signoff",
+        "filter": filter_signoff,
+    },
+    "GPG (merge commits)": {
+        "param": "gpg",
+        "filter": filter_gpg,
+    },
+    "Regex (merge commits)": {
+        "param": "regex",
+        "filter": filter_regex,
+    },
+    "Author name regex (merge commits)": {
+        "param": "author_name_regex",
+        "filter": filter_author_name_regex,
+    },
+    "Author email regex (merge commits)": {
+        "param": "author_email_regex",
+        "filter": filter_author_email_regex,
+    },
+}
+
+
+def _generic_check(commit_range, predicate, merge_commits):
+    desired_parents_count = 2 if merge_commits else 1
     try:
         return list(
             filter(
                 predicate,
-                filter(lambda commit: len(commit.parents) == 1, commit_range),
+                filter(
+                    lambda commit: len(commit.parents) == desired_parents_count,
+                    commit_range,
+                ),
             )
         )
     except GitCommandError as err:
@@ -82,28 +126,33 @@ def analyze_commits(config):
         print_error(f"Cannot open git repo at {repository_path}. Error: {err}")
         sys.exit(ERROR_EXIT_CODE)
     all_clear = True
-    for rule in RULES:
-        if not config["rules"][RULES[rule]["param"]]:
-            logging.info("Rule '%s' disabled. Skip.", rule)
-            continue
-        logging.debug("Rule '%s' enabled. Start.", rule)
-        print(f"[{rule}] - ", end="")
-        predicate = functools.partial(RULES[rule]["filter"], config=config)
-        failed = _generic_check(
-            repo.iter_commits(rev=config["main"]["range"]), predicate
-        )
-        if failed:
-            print_error("ERROR")
-            all_clear = False
-            logging.info("Failed %d commit for '%s' rule", len(failed), rule)
-            for commit in failed:
-                logging.debug(
-                    "Hash: %s, message: '%s'", commit.hexsha, commit.summary
+    for (rules, merge_commits) in [(RULES, False), (MERGE_RULES, True)]:
+        for rule in rules:
+            if not config["rules"][rules[rule]["param"]]:
+                logging.info("Rule '%s' disabled. Skip.", rule)
+                continue
+            logging.debug("Rule '%s' enabled. Start.", rule)
+            print(f"[{rule}] - ", end="")
+            predicate = functools.partial(rules[rule]["filter"], config=config)
+            failed = _generic_check(
+                repo.iter_commits(rev=config["main"]["range"]),
+                predicate,
+                merge_commits,
+            )
+            if failed:
+                print_error("ERROR")
+                all_clear = False
+                logging.info(
+                    "Failed %d commit for '%s' rule", len(failed), rule
                 )
-                print(f"Hash: {commit.hexsha}, message: '{commit.summary}'")
-        else:
-            logging.info("Errors not found for rule '%s'", rule)
-            print_success("SUCCESS")
+                for commit in failed:
+                    logging.debug(
+                        "Hash: %s, message: '%s'", commit.hexsha, commit.summary
+                    )
+                    print(f"Hash: {commit.hexsha}, message: '{commit.summary}'")
+            else:
+                logging.info("Errors not found for rule '%s'", rule)
+                print_success("SUCCESS")
     if all_clear:
         logging.info("All clear.")
         print_success("All clear.")
