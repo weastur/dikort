@@ -93,17 +93,15 @@ def _from_cmd_args_to_config(cmd_args):
         if args_dict[param] is not None
     }
     result = {}
-    for section in DEFAULTS:
-        for option in DEFAULTS[section]:
-            if option not in filtered_dict:
-                continue
-            result.setdefault(section, {})[option] = filtered_dict[option]
+    for option in filtered_dict:
+        section, param = option.split(":")
+        result.setdefault(section, {})[param] = filtered_dict[option]
     return result
 
 
 def merge(cmd_args):
     result = DEFAULTS.copy()
-    _merge_fileconfig(result, cmd_args.config or result["main"]["config"])
+    _merge_fileconfig(result, vars(cmd_args)["main:config"] or result["main"]["config"])
     config_from_cmdline = _from_cmd_args_to_config(cmd_args)
     for section in result:
         if section not in config_from_cmdline:
@@ -183,204 +181,242 @@ def configure_argparser(cmd_args_parser):
     cmd_args_parser.add_argument(
         "-c",
         "--config",
+        dest="main:config",
         help=f"Config file location (default: {DEFAULTS['main']['config']}",
     )
     cmd_args_parser.add_argument(
         "-r",
         "--repository",
+        dest="main:repository",
         help=f"Repository location (default: {DEFAULTS['main']['repository']})",
     )
     cmd_args_parser.add_argument(
         "--enable-logging",
+        dest="logging:enabled",
         help=f"Enable logs output to stderr (default: {DEFAULTS['logging']['enabled']})",
         default=None,
         action="store_true",
     )
     cmd_args_parser.add_argument(
         "--logging-format",
+        dest="logging:format",
         help="Format string for logging (Python style)",
     )
     cmd_args_parser.add_argument(
         "--logging-datefmt",
+        dest="logging:datefmt",
         help="Format string for logging datetime (Python style)",
     )
     cmd_args_parser.add_argument(
         "--logging-level",
+        dest="logging:level",
         help="Logging level (Python style)",
     )
     cmd_args_parser.add_argument(
         "--min-length",
+        dest="rules.settings:min_length",
         type=int,
         help=f"Minimum commit length (default: {DEFAULTS['rules.settings']['min_length']})",
     )
     cmd_args_parser.add_argument(
         "--max-length",
+        dest="rules.settings:max_length",
         type=int,
         help=f"Maximum commit length (default: {DEFAULTS['rules.settings']['max_length']})",
     )
     cmd_args_parser.add_argument(
-        "--regex", help="Regex to check commit message summary"
+        "--regex",
+        help="Regex to check commit message summary",
+        dest="rules.settings:regex",
     )
     cmd_args_parser.add_argument(
-        "--author-name-regex", help="Regex to check author name"
+        "--author-name-regex",
+        help="Regex to check author name",
+        dest="rules.settings:author_name_regex",
     )
     cmd_args_parser.add_argument(
-        "--author-email-regex", help="Regex to check author email"
+        "--author-email-regex",
+        help="Regex to check author email",
+        dest="rules.settings:author_email_regex",
     )
     cmd_args_parser.add_argument(
         "--capitalized-summary",
         default=None,
+        dest="rules.settings:capitalized_summary",
         action="store_true",
         help=f"Capitalized summary (default: {DEFAULTS['rules.settings']['capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--no-capitalized-summary",
-        dest="capitalized_summary",
+        dest="rules.settings:capitalized_summary",
         action="store_false",
         help="Not capitalized summary",
     )
     cmd_args_parser.add_argument(
         "--trailing-period",
         default=None,
+        dest="rules.settings:trailing_period",
         action="store_true",
         help="Presence of trailing period",
     )
     cmd_args_parser.add_argument(
         "--no-trailing-period",
-        dest="trailing_period",
+        dest="rules.settings:trailing_period",
         action="store_false",
         help=f"No trailing period (default: {DEFAULTS['rules.settings']['trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--singleline-summary",
         default=None,
+        dest="rules.settings:singleline_summary",
         action="store_true",
         help=f"Singleline summary (default: {DEFAULTS['rules.settings']['singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--no-singleline-summary",
-        dest="singleline_summary",
+        dest="rules.settings:singleline_summary",
         action="store_false",
         help="Multiline summary",
     )
     cmd_args_parser.add_argument(
         "--signoff",
         default=None,
+        dest="rules.settings:signoff",
         action="store_true",
         help=f"Presence of signoff (default: {DEFAULTS['rules.settings']['signoff']})",
     )
     cmd_args_parser.add_argument(
         "--no-signoff",
-        dest="signoff",
+        dest="rules.settings:signoff",
         action="store_false",
         help="No signoff",
     )
     cmd_args_parser.add_argument(
         "--gpg",
         default=None,
+        dest="rules.settings:gpg",
         action="store_true",
         help=f"Presence of GPG sign (default: {DEFAULTS['rules.settings']['gpg']})",
     )
     cmd_args_parser.add_argument(
         "--no-gpg",
-        dest="gpg",
+        dest="rules.settings:gpg",
         action="store_false",
         help="No GPG sign",
     )
     cmd_args_parser.add_argument(
         "--enable-length-check",
         action="store_true",
+        dest="rules:length",
         default=None,
         help=f"Enable length check (default: {DEFAULTS['rules']['length']})",
     )
     cmd_args_parser.add_argument(
         "--enable-capitalized-summary-check",
         action="store_true",
+        dest="rules:capitalized_summary",
         default=None,
         help=f"Enable capitalized summary check (default: {DEFAULTS['rules']['capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-trailing-period-check",
         action="store_true",
+        dest="rules:trailing_period",
         default=None,
         help=f"Enable trailing period check (default: {DEFAULTS['rules']['trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--enable-singleline-summary-check",
         action="store_true",
+        dest="rules:singleline_summary",
         default=None,
         help=f"Enable single line summary check (default: {DEFAULTS['rules']['singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-signoff-check",
         action="store_true",
+        dest="rules:signoff",
         default=None,
         help=f"Enable checking for signoff (default: {DEFAULTS['rules']['signoff']})",
     )
     cmd_args_parser.add_argument(
         "--enable-gpg-check",
         action="store_true",
+        dest="rules:gpg",
         default=None,
         help=f"Enable checking for GPG sign (default: {DEFAULTS['rules']['gpg']})",
     )
     cmd_args_parser.add_argument(
         "--enable-regex-check",
         action="store_true",
+        dest="rules:regex",
         default=None,
         help=f"Enable check by regex (default: {DEFAULTS['rules']['regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-author-name-regex-check",
         action="store_true",
+        dest="rules:author_name_regex",
         default=None,
         help=f"Enable author name check by regex (default: {DEFAULTS['rules']['author_name_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-author-email-regex-check",
         action="store_true",
+        dest="rules:author_email_regex",
         default=None,
         help=f"Enable author email check by regex (default: {DEFAULTS['rules']['author_email_regex']})",
     )
     cmd_args_parser.add_argument(
         "--merge-min-length",
         type=int,
+        dest="merge_rules.settings:min_length",
         help=f"Minimum commit length (default: {DEFAULTS['merge_rules.settings']['min_length']})",
     )
     cmd_args_parser.add_argument(
         "--merge-max-length",
         type=int,
+        dest="merge_rules.settings:max_length",
         help=f"Maximum commit length (default: {DEFAULTS['merge_rules.settings']['max_length']})",
     )
     cmd_args_parser.add_argument(
-        "--merge-regex", help="Regex to check commit message summary"
+        "--merge-regex",
+        help="Regex to check commit message summary",
+        dest="merge_rules.settings:regex",
     )
     cmd_args_parser.add_argument(
-        "--merge-author-name-regex", help="Regex to check author name"
+        "--merge-author-name-regex",
+        help="Regex to check author name",
+        dest="merge_rules.settings:author_name_regex",
     )
     cmd_args_parser.add_argument(
-        "--merge-author-email-regex", help="Regex to check author email"
+        "--merge-author-email-regex",
+        help="Regex to check author email",
+        dest="merge_rules.settings:author_email_regex",
     )
     cmd_args_parser.add_argument(
         "--merge-capitalized-summary",
         default=None,
         action="store_true",
+        dest="merge_rules.settings:capitalized_summary",
         help=f"Capitalized summary (default: {DEFAULTS['merge_rules.settings']['capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--no-merge-capitalized-summary",
-        dest="capitalized_summary",
+        dest="merge_rules.settings:capitalized_summary",
         action="store_false",
         help="Not capitalized summary",
     )
     cmd_args_parser.add_argument(
         "--merge-trailing-period",
         default=None,
+        dest="merge_rules.settings:trailing_period",
         action="store_true",
         help="Presence of trailing period",
     )
     cmd_args_parser.add_argument(
         "--no-merge-trailing-period",
-        dest="trailing_period",
+        dest="merge_rules.settings:trailing_period",
         action="store_false",
         help=f"No trailing period (default: {DEFAULTS['merge_rules.settings']['trailing_period']})",
     )
@@ -388,23 +424,25 @@ def configure_argparser(cmd_args_parser):
         "--merge-singleline-summary",
         default=None,
         action="store_true",
+        dest="merge_rules.settings:singleline_summary",
         help=f"Singleline summary (default: {DEFAULTS['merge_rules.settings']['singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--no-merge-singleline-summary",
-        dest="singleline_summary",
+        dest="merge_rules.settings:singleline_summary",
         action="store_false",
         help="Multiline summary",
     )
     cmd_args_parser.add_argument(
         "--merge-signoff",
         default=None,
+        dest="merge_rules.settings:signoff",
         action="store_true",
         help=f"Presence of signoff (default: {DEFAULTS['merge_rules.settings']['signoff']})",
     )
     cmd_args_parser.add_argument(
         "--no-merge-signoff",
-        dest="signoff",
+        dest="merge_rules.settings:signoff",
         action="store_false",
         help="No signoff",
     )
@@ -412,11 +450,12 @@ def configure_argparser(cmd_args_parser):
         "--merge-gpg",
         default=None,
         action="store_true",
+        dest="merge_rules.settings:gpg",
         help=f"Presence of GPG sign (default: {DEFAULTS['merge_rules.settings']['gpg']})",
     )
     cmd_args_parser.add_argument(
         "--no-merge-gpg",
-        dest="gpg",
+        dest="merge_rules.settings:gpg",
         action="store_false",
         help="No GPG sign",
     )
@@ -424,58 +463,68 @@ def configure_argparser(cmd_args_parser):
         "--enable-merge-length-check",
         action="store_true",
         default=None,
+        dest="merge_rules:length",
         help=f"Enable length check (default: {DEFAULTS['merge_rules']['length']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-capitalized-summary-check",
         action="store_true",
         default=None,
+        dest="merge_rules:capitalized_summary",
         help=f"Enable capitalized summary check (default: {DEFAULTS['merge_rules']['capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-trailing-period-check",
         action="store_true",
         default=None,
+        dest="merge_rules:trailing_period",
         help=f"Enable trailing period check (default: {DEFAULTS['merge_rules']['trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-singleline-summary-check",
         action="store_true",
         default=None,
+        dest="merge_rules:singleline_summary",
         help=f"Enable single line summary check (default: {DEFAULTS['merge_rules']['singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-signoff-check",
         action="store_true",
         default=None,
+        dest="merge_rules:signoff",
         help=f"Enable checking for signoff (default: {DEFAULTS['merge_rules']['signoff']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-gpg-check",
         action="store_true",
         default=None,
+        dest="merge_rules:gpg",
         help=f"Enable checking for GPG sign (default: {DEFAULTS['merge_rules']['gpg']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-regex-check",
         action="store_true",
         default=None,
+        dest="merge_rules:regex",
         help=f"Enable check by regex (default: {DEFAULTS['merge_rules']['regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-author-name-regex-check",
         action="store_true",
         default=None,
+        dest="merge_rules:author_name_regex",
         help=f"Enable author name check by regex (default: {DEFAULTS['merge_rules']['author_name_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-author-email-regex-check",
         action="store_true",
         default=None,
+        dest="merge_rules:author_email_regex",
         help=f"Enable author email check by regex (default: {DEFAULTS['merge_rules']['author_email_regex']})",
     )
     cmd_args_parser.add_argument(
-        "range",
+        "main:range",
         nargs="?",
+        metavar="range",
         help=f"Commit range (default: {DEFAULTS['main']['range']})",
     )
