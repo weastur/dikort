@@ -14,7 +14,7 @@ install:
 script:
   - black --check dikort
   - isort -c dikort
-  - coverage run -m unittest discover
+  - coverage run -m unittest discover > /dev/null
 
 after_success:
   - codecov
