@@ -52,7 +52,7 @@ pip3 install --user dikort
 
 ## File configuration
 
-Refer to [config example](./dikort.cfg.example), as a full configuration file.
+Refer to [config example](./dikort.example.cfg), as a full configuration file.
 
 ## Development Status
 
