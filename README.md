@@ -50,9 +50,40 @@ pip3 install --user dikort
 
 ## Running and Configuring
 
+Dikort is a command line tool. To see all available options with explanation hit `dikort -h`. 
+The one unnamed option is commit range in the notation of "<commit1>..<commit2>", where "commit1" and "commit2" are any of:
+hash, branch, tag, HEAD pointer.
+
+### Examples
+
+#### Check last 5 commit. Use this in git pre-commit hook
+```shell
+dikort HEAD~1..HEAD
+```
+
+#### Check last 10 commits
+```shell
+dikort HEAD~10..HEAD
+```
+
+#### Check all commits in fix-123 branch
+```shell
+dikort master..fix-123
+```
+
+#### Configure through command line
+```shell
+dikort --enable-length --enable-capitalized-summary --min-length=20 --max-length=72 HEAD~5..HEAD
+```
+
+#### Get logs and save in to stderr (DEBUG mode)
+```shell
+dikort --enable-logging --logging-level=DEBUG 2>debug.log
+```
+
 ## File configuration
 
-Refer to [config example](./dikort.example.cfg), as a full configuration file.
+Refer to [config example](./dikort.example.cfg), as a full configuration file. By default, config searched at `./.dikort.cfg` 
 
 ## Development Status
 
