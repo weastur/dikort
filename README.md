@@ -13,26 +13,26 @@ The tool that helps you make commit message in your repository clear.
 
 ## Key Features
 
-* Wide check list: author name, email, trailing periods, capitalize sentence, singoff, gpg, regex.
-* Check any commit range: acceptable for both CI and pre-commit hook usage
+* Wide check list: author name, email, trailing periods, capitalize sentence, singleline summary, singoff, gpg, regex.
+* Checks any commit range: acceptable for both CI and pre-commit hook usage
 * Separate rules for both: merge and regular commits
 * Support all available python versions: 3.6+
 
 ## Technical Requirements/Installation
 
 ### Pre-requirements
-Install any supported python distribution (for now it's 3.6+), and pip package management tool.
+Install any supported python distribution (for now it's 3.6+), and pip package management tool. Also make sure you have git installed
 
 Examples:
 
 #### Ubuntu/Debian
 ```shell
-sudo apt install python3 python3-pip
+sudo apt install python3 python3-pip git
 ```
 
 #### CentOS/RedHat/Fedora
 ```shell
-sudo yum install python3
+sudo yum install python3 git
 ```
 
 ### Installation
@@ -43,7 +43,7 @@ By default, pip tries to install package directly to you system. You may need to
 sudo pip3 install dikort
 ```
 
-The more accurate way is to install to your home directory. But be sure you have `$HOME/.local/bin` at your `$PATH` variable 
+The more right way is to **install to your home directory**. But be sure you have `$HOME/.local/bin` at your `$PATH` variable 
 ```shell
 pip3 install --user dikort
 ```
@@ -51,12 +51,12 @@ pip3 install --user dikort
 ## Running and Configuring
 
 Dikort is a command line tool. To see all available options with explanation hit `dikort -h`. 
-The one unnamed option is commit range in the notation of "<commit1>..<commit2>", where "commit1" and "commit2" are any of:
+The only one unnamed option is commit range in the notation of `"<commit1>..<commit2>"`, where `"commit1"` and `"commit2"` are any of:
 hash, branch, tag, HEAD pointer.
 
 ### Examples
 
-#### Check last 5 commit. Use this in git pre-commit hook
+#### Check last commit. Use this in git pre-commit hook
 ```shell
 dikort HEAD~1..HEAD
 ```
@@ -76,9 +76,17 @@ dikort master..fix-123
 dikort --enable-length --enable-capitalized-summary --min-length=20 --max-length=72 HEAD~5..HEAD
 ```
 
-#### Get logs and save in to stderr (DEBUG mode)
+#### Get log and save it (DEBUG mode)
 ```shell
 dikort --enable-logging --logging-level=DEBUG 2>debug.log
+```
+
+### Run in docker
+
+Also you can run inside docker. Just mount your repository to container and tell dikort where to find.
+
+```shell
+docker run -v `pwd`:/tmp/repo weastur/dikort:latest --repository=/tmp/repo --enable-length
 ```
 
 ## File configuration
@@ -93,7 +101,7 @@ We report new releases information [here](https://github.com/weastur/dikort/rele
 
 ## How to contribute
 
-Fork, clone, setup development environment. No third-party tools need.
+Fork, clone, setup development environment. **No third-party build or test tools** need to be insttalled at your system.
 
 ```shell
 python3 -m venv .venv
