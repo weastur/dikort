@@ -1,5 +1,3 @@
-# dikort
-
 [![Build Status](https://travis-ci.com/weastur/dikort.svg?branch=main)](https://travis-ci.com/weastur/dikort)
 [![codecov](https://codecov.io/gh/weastur/dikort/branch/main/graph/badge.svg)](https://codecov.io/gh/weastur/dikort)
 [![PyPi version](https://img.shields.io/pypi/v/dikort.svg)](https://pypi.org/project/dikort/)
@@ -9,13 +7,73 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![visitors](https://visitor-badge.glitch.me/badge?page_id=weastur.dikort)
 
-Commit message format checking tool
+# Dikort: git commit message format checking tool
+
+The tool that helps you make commit message in your repository clear.
+
+## Key Features
+
+* Wide check list: author name, email, trailing periods, capitalize sentence, singoff, gpg, regex.
+* Check any commit range: acceptable for both CI and pre-commit hook usage
+* Separate rules for both: merge and regular commits
+* Support all available python versions: 3.6+
+
+## Technical Requirements/Installation
+
+### Pre-requirements
+Install any supported python distribution (for now it's 3.6+), and pip package management tool.
+
+Examples:
+
+#### Ubuntu/Debian
+```shell
+sudo apt install python3 python3-pip
+```
+
+#### CentOS/RedHat/Fedora
+```shell
+sudo yum install python3
+```
+
+### Installation
+
+By default, pip tries to install package directly to you system. You may need to use sudo to achieve this
+
+```shell
+sudo pip3 install dikort
+```
+
+The more accurate way is to install to your home directory. But be sure you have `$HOME/.local/bin` at your `$PATH` variable 
+```shell
+pip3 install --user dikort
+```
+
+## Running and Configuring
+
+## File configuration
+
+Refer to [config example](./dikort.cfg.example), as a full configuration file.
+
+## Development Status
+
+Dikort is in active development and accepts contributions. See our [Contributing](#how-to-contribute) section below for more details.
+
+We report new releases information [here](https://github.com/weastur/dikort/releases).
+
+## How to contribute
+
+Fork, clone, setup development environment. No third-party tools need.
 
 ```shell
 python3 -m venv .venv
 . ./.venv/bin/activate
 pip install setuptools wheel
 pip install -e '.[dev]'
-python -m build
 ```
 
+After that you'll have dikort and all development tools installed into virtualenv. Just run here `dikort` to execute your development version.
+Hack, then make PR. Don't forget to write unit tests, and check your code with `flake8`, `isort`, `black`.   
+
+## License
+
+MIT, see [LICENSE](./LICENSE).
