@@ -107,4 +107,4 @@ class TestAnalyzer(TestCase):
         _generic_check_mock.return_value = []
         _process_failed_commits_mock.return_value = False
         analyze_commits(config)
-        _finish_mock.assert_called_with(False)
+        _finish_mock.assert_called_with(True)
