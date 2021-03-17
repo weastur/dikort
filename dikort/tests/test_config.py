@@ -1,7 +1,6 @@
 import argparse
 import configparser
 import copy
-import io
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
@@ -66,9 +65,7 @@ class TestFileConfig(TestCase):
     @patch("builtins.open")
     @patch("dikort.config.print_error")
     @patch("sys.exit")
-    def test_read_file_notfound(
-        self, sys_exit_mock, print_error_mock, open_mock
-    ):
+    def test_read_file_notfound(self, sys_exit_mock, print_error_mock, open_mock):
         open_mock.side_effect = FileNotFoundError()
         configparser_instance = Mock()
         _read_file_config(configparser_instance, DEFAULTS["main"]["config"])
@@ -99,7 +96,7 @@ class TestFileConfig(TestCase):
 
 class TestMerge(TestCase):
     def test_post_processing(self):
-        config = copy.deepcopy(DEFAULTS)
+        config = copy.deepcopy(DEFAULTS.copy())
         _post_processing(config)
         self.assertEqual(
             config["rules.settings"]["regex"].pattern,
@@ -128,24 +125,16 @@ class TestMerge(TestCase):
 
     @patch("dikort.config.print_error")
     @patch("sys.exit")
-    def test_parse_value_from_file_success(
-        self, sys_exit_mock, print_error_mock
-    ):
+    def test_parse_value_from_file_success(self, sys_exit_mock, print_error_mock):
         config = configparser.ConfigParser(interpolation=None)
         config.add_section("logging")
         config.add_section("rules.settings")
         config["logging"]["enabled"] = "yes"
         config["rules.settings"]["min_length"] = "5"
         config["logging"]["format"] = "format"
-        self.assertEqual(
-            _parse_value_from_file(config, "enabled", "logging"), True
-        )
-        self.assertEqual(
-            _parse_value_from_file(config, "format", "logging"), "format"
-        )
-        self.assertEqual(
-            _parse_value_from_file(config, "min_length", "rules.settings"), 5
-        )
+        self.assertEqual(_parse_value_from_file(config, "enabled", "logging"), True)
+        self.assertEqual(_parse_value_from_file(config, "format", "logging"), "format")
+        self.assertEqual(_parse_value_from_file(config, "min_length", "rules.settings"), 5)
         self.assertEqual(print_error_mock.call_count, 0)
         self.assertEqual(sys_exit_mock.call_count, 0)
 
@@ -191,8 +180,7 @@ class TestMerge(TestCase):
         _from_cmd_args_to_config_mock,
         _merge_fileconfig_mock,
     ):
-        initial_config = copy.deepcopy(DEFAULTS)
-        expected_result_config = copy.deepcopy(DEFAULTS)
+        expected_result_config = copy.deepcopy(DEFAULTS.copy())
         expected_result_config["rules.settings"]["regex"] = r"ISSUE-\d+: .*"
         _from_cmd_args_to_config_mock.return_value = {
             "rules.settings": {
@@ -202,7 +190,7 @@ class TestMerge(TestCase):
 
         cmd_args_parser = argparse.ArgumentParser()
         configure_argparser(cmd_args_parser)
-        cmd_args = cmd_args_parser.parse_args(["--regex 'ISSUE-\d+: .*'"])
+        cmd_args = cmd_args_parser.parse_args([r"--regex 'ISSUE-\d+: .*'"])
 
         actual_result_config = merge(cmd_args)
 
@@ -217,9 +205,7 @@ class TestCmdArgs(TestCase):
     def test_from_cmd_args_to_config(self):
         cmd_args_parser = argparse.ArgumentParser()
         configure_argparser(cmd_args_parser)
-        cmd_args = cmd_args_parser.parse_args(
-            ["--config=/tmp/.dikort.cfg", "--enable-logging", "HEAD~1..HEAD"]
-        )
+        cmd_args = cmd_args_parser.parse_args(["--config=/tmp/.dikort.cfg", "--enable-logging", "HEAD~1..HEAD"])
         expected_config = {
             "logging": {
                 "enabled": True,

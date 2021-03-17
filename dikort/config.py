@@ -2,8 +2,9 @@ import configparser
 import copy
 import re
 import sys
+import types
 
-from dikort.print import print_error, print_warning
+from dikort.print import print_error
 
 _FILE_CONFIG_INT_OPTIONS = ("min_length", "max_length")
 _FILE_CONFIG_BOOL_OPTIONS = (
@@ -25,97 +26,94 @@ _FILE_CONFIG_BOOL_OPTIONS = (
 )
 ERROR_EXIT_CODE = 128
 FAILED_EXIT_CODE = 1
-DEFAULTS = {
-    "main": {
-        "config": "./.dikort.cfg",
-        "repository": "./",
-        "range": "HEAD",
-    },
-    "rules": {
-        "length": True,
-        "capitalized_summary": True,
-        "trailing_period": True,
-        "singleline_summary": True,
-        "signoff": False,
-        "gpg": False,
-        "regex": False,
-        "author_name_regex": False,
-        "author_email_regex": False,
-    },
-    "rules.settings": {
-        "min_length": 10,
-        "max_length": 50,
-        "capitalized_summary": True,
-        "trailing_period": False,
-        "singleline_summary": True,
-        "signoff": True,
-        "gpg": True,
-        "regex": ".*",
-        "author_name_regex": ".*",
-        "author_email_regex": ".*",
-    },
-    "merge_rules": {
-        "length": True,
-        "capitalized_summary": True,
-        "trailing_period": True,
-        "singleline_summary": True,
-        "signoff": False,
-        "gpg": False,
-        "regex": False,
-        "author_name_regex": False,
-        "author_email_regex": False,
-    },
-    "merge_rules.settings": {
-        "min_length": 10,
-        "max_length": 50,
-        "capitalized_summary": True,
-        "trailing_period": False,
-        "singleline_summary": True,
-        "signoff": True,
-        "gpg": True,
-        "regex": ".*",
-        "author_name_regex": ".*",
-        "author_email_regex": ".*",
-    },
-    "logging": {
-        "enabled": False,
-        "format": "%(levelname)s - %(asctime)s - %(filename)s:%(lineno)d - %(message)s",
-        "datefmt": "%Y-%m-%d %H:%M:%S",
-        "level": "INFO",
-    },
-}
-
-
-def _from_cmd_args_to_config(cmd_args):
-    args_dict = vars(cmd_args)
-    filtered_dict = {
-        param: args_dict[param]
-        for param in args_dict
-        if args_dict[param] is not None
+DEFAULTS = types.MappingProxyType(
+    {
+        "main": {
+            "config": "./.dikort.cfg",
+            "repository": "./",
+            "range": "HEAD",
+        },
+        "rules": {
+            "length": True,
+            "capitalized_summary": True,
+            "trailing_period": True,
+            "singleline_summary": True,
+            "signoff": False,
+            "gpg": False,
+            "regex": False,
+            "author_name_regex": False,
+            "author_email_regex": False,
+        },
+        "rules.settings": {
+            "min_length": 10,
+            "max_length": 50,
+            "capitalized_summary": True,
+            "trailing_period": False,
+            "singleline_summary": True,
+            "signoff": True,
+            "gpg": True,
+            "regex": ".*",
+            "author_name_regex": ".*",
+            "author_email_regex": ".*",
+        },
+        "merge_rules": {
+            "length": True,
+            "capitalized_summary": True,
+            "trailing_period": True,
+            "singleline_summary": True,
+            "signoff": False,
+            "gpg": False,
+            "regex": False,
+            "author_name_regex": False,
+            "author_email_regex": False,
+        },
+        "merge_rules.settings": {
+            "min_length": 10,
+            "max_length": 50,
+            "capitalized_summary": True,
+            "trailing_period": False,
+            "singleline_summary": True,
+            "signoff": True,
+            "gpg": True,
+            "regex": ".*",
+            "author_name_regex": ".*",
+            "author_email_regex": ".*",
+        },
+        "logging": {
+            "enabled": False,
+            "format": "%(levelname)s - %(asctime)s - %(filename)s:%(lineno)d - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "level": "INFO",
+        },
     }
-    result = {}
+)
+
+
+def _from_cmd_args_to_config(cmd_args):  # noqa: WPS210
+    args_dict = vars(cmd_args)
+    filtered_dict = {param_name: args_dict[param_name] for param_name in args_dict if args_dict[param_name] is not None}
+    result_config = {}
     for option in filtered_dict:
-        section, param = option.split(":")
-        result.setdefault(section, {})[param] = filtered_dict[option]
-    return result
+        section, param_name = option.split(":")
+        result_config.setdefault(section, {})[param_name] = filtered_dict[option]
+    return result_config
 
 
 def merge(cmd_args):
-    result = copy.deepcopy(DEFAULTS)
-    _merge_fileconfig(
-        result, vars(cmd_args)["main:config"] or result["main"]["config"]
-    )
+    result_config = copy.deepcopy(DEFAULTS.copy())
+    cmd_args_config_location = vars(cmd_args)["main:config"]
+    _merge_fileconfig(result_config, cmd_args_config_location or result_config["main"]["config"])
     config_from_cmdline = _from_cmd_args_to_config(cmd_args)
-    for section in result:
+    for section in result_config:
         if section not in config_from_cmdline:
             continue
-        result[section].update(config_from_cmdline[section])
-    _validate(result)
-    _post_processing(result)
-    return result
+        result_config[section].update(config_from_cmdline[section])
+    _validate(result_config)
+    _post_processing(result_config)
+    return result_config
 
 
-def _merge_fileconfig(config, file_config_path):
+def _merge_fileconfig(config, file_config_path):  # noqa: WPS231
     file_config = configparser.ConfigParser(interpolation=None)
     _read_file_config(file_config, file_config_path)
     for section in config:
@@ -124,22 +122,20 @@ def _merge_fileconfig(config, file_config_path):
         for option in config[section]:
             if option not in file_config.options(section):
                 continue
-            config[section][option] = _parse_value_from_file(
-                file_config, option, section
-            )
+            config[section][option] = _parse_value_from_file(file_config, option, section)
 
 
 def _parse_value_from_file(file_config, option, section):
-    value = file_config[section][option]
+    option_value = file_config[section][option]
     try:
         if option in _FILE_CONFIG_INT_OPTIONS:
-            value = file_config[section].getint(option)
+            option_value = file_config[section].getint(option)
         elif option in _FILE_CONFIG_BOOL_OPTIONS:
-            value = file_config[section].getboolean(option)
+            option_value = file_config[section].getboolean(option)
     except ValueError:
         print_error(f"Cannot parse option {section}:{option}")
         sys.exit(ERROR_EXIT_CODE)
-    return value
+    return option_value
 
 
 def _read_file_config(file_config, file_config_path):
@@ -157,37 +153,19 @@ def _read_file_config(file_config, file_config_path):
 
 
 def _validate(config):
-    if (
-        config["rules.settings"]["min_length"]
-        > config["rules.settings"]["max_length"]
-    ):
-        print_error(
-            "rules.settings.min_length is greater than rules.settings.max_length"
-        )
+    if config["rules.settings"]["min_length"] > config["rules.settings"]["max_length"]:
+        print_error("rules.settings.min_length is greater than rules.settings.max_length")
         sys.exit(ERROR_EXIT_CODE)
-    if (
-        config["merge_rules.settings"]["min_length"]
-        > config["merge_rules.settings"]["max_length"]
-    ):
-        print_error(
-            "merge_rules.settings.min_length is greater than merge_rules.settings.max_length"
-        )
+    if config["merge_rules.settings"]["min_length"] > config["merge_rules.settings"]["max_length"]:
+        print_error("merge_rules.settings.min_length is greater than merge_rules.settings.max_length")
         sys.exit(ERROR_EXIT_CODE)
 
 
 def _post_processing(config):
-    config["rules.settings"]["regex"] = re.compile(
-        config["rules.settings"]["regex"]
-    )
-    config["rules.settings"]["author_name_regex"] = re.compile(
-        config["rules.settings"]["author_name_regex"]
-    )
-    config["rules.settings"]["author_email_regex"] = re.compile(
-        config["rules.settings"]["author_email_regex"]
-    )
-    config["merge_rules.settings"]["regex"] = re.compile(
-        config["merge_rules.settings"]["regex"]
-    )
+    config["rules.settings"]["regex"] = re.compile(config["rules.settings"]["regex"])
+    config["rules.settings"]["author_name_regex"] = re.compile(config["rules.settings"]["author_name_regex"])
+    config["rules.settings"]["author_email_regex"] = re.compile(config["rules.settings"]["author_email_regex"])
+    config["merge_rules.settings"]["regex"] = re.compile(config["merge_rules.settings"]["regex"])
     config["merge_rules.settings"]["author_name_regex"] = re.compile(
         config["merge_rules.settings"]["author_name_regex"]
     )
@@ -196,7 +174,7 @@ def _post_processing(config):
     )
 
 
-def configure_argparser(cmd_args_parser):
+def configure_argparser(cmd_args_parser):  # noqa: WPS213
     cmd_args_parser.add_argument(
         "-c",
         "--config",

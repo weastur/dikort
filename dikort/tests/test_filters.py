@@ -36,17 +36,13 @@ class TestFilters(TestCase):
     def test_trailing_period(self):
         self.commit.summary = "No trailing period summary\n"
         self.config["trailing_period"] = False
-        self.assertFalse(
-            filter_trailing_period(self.commit, config=self.config)
-        )
+        self.assertFalse(filter_trailing_period(self.commit, config=self.config))
         self.config["trailing_period"] = True
         self.assertTrue(filter_trailing_period(self.commit, config=self.config))
 
         self.commit.summary = "Trailing period summary\n"
         self.config["trailing_period"] = False
-        self.assertFalse(
-            filter_trailing_period(self.commit, config=self.config)
-        )
+        self.assertFalse(filter_trailing_period(self.commit, config=self.config))
         self.config["trailing_period"] = True
         self.assertTrue(filter_trailing_period(self.commit, config=self.config))
 
@@ -82,9 +78,7 @@ class TestFilters(TestCase):
         self.assertFalse(filter_length(self.commit, config=self.config))
 
     def test_signoff(self):
-        self.commit.message = (
-            "My Awesome commit\n" "Fixed all bugs.\n" "Signed-off-by: Neo\n"
-        )
+        self.commit.message = "My Awesome commit\n" "Fixed all bugs.\n" "Signed-off-by: Neo\n"
         self.config["signoff"] = True
         self.assertFalse(filter_signoff(self.commit, config=self.config))
         self.config["signoff"] = False
@@ -121,22 +115,14 @@ class TestFilters(TestCase):
         self.config["author_name_regex"] = re.compile(r"\w+ \w+")
 
         self.commit.author.name = "Pavel Sapezhko"
-        self.assertFalse(
-            filter_author_name_regex(self.commit, config=self.config)
-        )
+        self.assertFalse(filter_author_name_regex(self.commit, config=self.config))
         self.commit.author.name = "Pavel"
-        self.assertTrue(
-            filter_author_name_regex(self.commit, config=self.config)
-        )
+        self.assertTrue(filter_author_name_regex(self.commit, config=self.config))
 
     def test_author_email_regex(self):
         self.config["author_email_regex"] = re.compile(r"\w+@example.com")
 
         self.commit.author.email = "neo@example.com"
-        self.assertFalse(
-            filter_author_email_regex(self.commit, config=self.config)
-        )
+        self.assertFalse(filter_author_email_regex(self.commit, config=self.config))
         self.commit.author.email = "neo@matrix.com"
-        self.assertTrue(
-            filter_author_email_regex(self.commit, config=self.config)
-        )
+        self.assertTrue(filter_author_email_regex(self.commit, config=self.config))

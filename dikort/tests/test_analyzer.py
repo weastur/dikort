@@ -1,4 +1,3 @@
-import configparser
 import copy
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
@@ -21,7 +20,7 @@ class TestCheck(TestCase):
     def test_generic_check_fail(self, sys_exit_mock, print_error_mock):
         commit_range = MagicMock()
         commit_range.__iter__.side_effect = GitCommandError("test", 123)
-        _generic_check(commit_range, None, False)
+        _generic_check(commit_range, None, check_merge_commits=False)
         print_error_mock.assert_called_once()
         sys_exit_mock.assert_called_once_with(ERROR_EXIT_CODE)
 
@@ -32,10 +31,10 @@ class TestCheck(TestCase):
         commit_range[0].parents = []
         commit_range[1].parents = [Mock()]
         commit_range[2].parents = [Mock(), Mock()]
-        result = _generic_check(commit_range, lambda commit: commit.good, False)
-        self.assertEqual(len(result), 1)
-        result = _generic_check(commit_range, lambda commit: commit.good, True)
-        self.assertEqual(len(result), 1)
+        actual_result = _generic_check(commit_range, lambda commit: commit.good, check_merge_commits=False)
+        self.assertEqual(len(actual_result), 1)
+        actual_result = _generic_check(commit_range, lambda commit: commit.good, check_merge_commits=True)
+        self.assertEqual(len(actual_result), 1)
 
 
 class TestAnalyzer(TestCase):
@@ -102,7 +101,7 @@ class TestAnalyzer(TestCase):
         _generic_check_mock,
         _open_repository_mock,
     ):
-        config = copy.deepcopy(DEFAULTS)
+        config = copy.deepcopy(DEFAULTS.copy())
         repo = Mock()
         _open_repository_mock.return_value = repo
         _generic_check_mock.return_value = []

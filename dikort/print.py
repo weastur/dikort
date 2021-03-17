@@ -1,31 +1,27 @@
 class BColors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKCYAN = "\033[96m"
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
+    header = "\033[95m"
+    okgreen = "\033[92m"
+    warning = "\033[93m"
+    fail = "\033[91m"
+    endc = "\033[0m"
 
 
 def print_header(*args, sep=" ", end="\n"):
-    _print_formatted(*args, sep=sep, end=end, formatter=BColors.HEADER)
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.header)
 
 
 def print_error(*args, sep=" ", end="\n"):
-    _print_formatted(*args, sep=sep, end=end, formatter=BColors.FAIL)
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.fail)
 
 
 def print_warning(*args, sep=" ", end="\n"):
-    _print_formatted(*args, sep=sep, end=end, formatter=BColors.WARNING)
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.warning)
 
 
 def print_success(*args, sep=" ", end="\n"):
-    _print_formatted(*args, sep=sep, end=end, formatter=BColors.OKGREEN)
+    _print_formatted(*args, sep=sep, end=end, formatter=BColors.okgreen)
 
 
 def _print_formatted(*args, sep=" ", end="\n", formatter=None):
     line = sep.join(args)
-    print(f"{formatter}{line}{BColors.ENDC}", end=end)
+    print(f"{formatter}{line}{BColors.endc}", end=end)
