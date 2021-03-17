@@ -103,7 +103,15 @@ pip install -e '.[dev]'
 ```
 
 After that you'll have dikort and all development tools installed into virtualenv. Just run here `dikort` to execute your development version.
-Hack, then make PR. Don't forget to write unit tests, and check your code with `flake8`, `isort`, `black`.   
+Hack, then make PR. Don't forget to write unit tests, and check your code:
+
+```shell
+flake8 dikort
+isort dikort
+black dikort
+coverage run -m unittest discover
+coverage report
+```
 
 ## License
 
