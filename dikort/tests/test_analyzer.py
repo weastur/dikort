@@ -102,9 +102,10 @@ class TestAnalyzer(TestCase):
         _open_repository_mock,
     ):
         config = copy.deepcopy(DEFAULTS.copy())
+        config["rules"]["length"] = True
         repo = Mock()
         _open_repository_mock.return_value = repo
         _generic_check_mock.return_value = []
         _process_failed_commits_mock.return_value = False
         analyze_commits(config)
-        _finish_mock.assert_called_with(True)
+        _finish_mock.assert_called_with(False)
