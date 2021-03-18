@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -ex
+
+dikort
+black --check dikort
+isort -c dikort
+flake8 dikort
+coverage run -m unittest discover
+coverage report
