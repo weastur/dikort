@@ -31,7 +31,7 @@ DEFAULTS = types.MappingProxyType(
         "main": {
             "config": "./.dikort.cfg",
             "repository": "./",
-            "range": "HEAD",
+            "range": "HEAD~1..HEAD",
         },
         "rules": {
             "enable_length": False,
