@@ -114,11 +114,20 @@ After that you'll have dikort and all development tools installed into virtualen
 Hack, then make PR. Don't forget to write unit tests, and check your code:
 
 ```shell
+dikort
 flake8 dikort
 isort dikort
 black dikort
 coverage run -m unittest discover
 coverage report
+```
+
+Or you can just install git-hooks
+
+### Git hooks
+
+```shell
+ln -s -r -t ./.git/hooks/ ./hooks/*
 ```
 
 ## License
