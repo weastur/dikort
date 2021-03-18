@@ -126,7 +126,6 @@ Or you can just install git-hooks
 
 ### Git hooks
 
-
 ```shell
 ln -s -r -t ./.git/hooks/ ./hooks/*
 ```
