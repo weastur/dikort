@@ -26,39 +26,39 @@ RULES = types.MappingProxyType(
         "check_merge_commits": False,
         "checks": {
             "Summary length": {
-                "param": "length",
+                "param": "enable_length",
                 "filter": filter_length,
             },
             "Trailing period": {
-                "param": "trailing_period",
+                "param": "enable_trailing_period",
                 "filter": filter_trailing_period,
             },
             "Capitalized summary": {
-                "param": "capitalized_summary",
+                "param": "enable_capitalized_summary",
                 "filter": filter_capitalized,
             },
             "Signle line summary": {
-                "param": "singleline_summary",
+                "param": "enable_singleline_summary",
                 "filter": filter_singleline,
             },
             "Signoff": {
-                "param": "signoff",
+                "param": "enable_signoff",
                 "filter": filter_signoff,
             },
             "GPG": {
-                "param": "gpg",
+                "param": "enable_gpg",
                 "filter": filter_gpg,
             },
             "Regex": {
-                "param": "regex",
+                "param": "enable_regex",
                 "filter": filter_regex,
             },
             "Author name regex": {
-                "param": "author_name_regex",
+                "param": "enable_author_name_regex",
                 "filter": filter_author_name_regex,
             },
             "Author email regex": {
-                "param": "author_email_regex",
+                "param": "enable_author_email_regex",
                 "filter": filter_author_email_regex,
             },
         },
@@ -72,39 +72,39 @@ MERGE_RULES = types.MappingProxyType(
         "check_merge_commits": True,
         "checks": {
             "Summary length (merge commits)": {
-                "param": "length",
+                "param": "enable_length",
                 "filter": filter_length,
             },
             "Trailing period (merge commits)": {
-                "param": "trailing_period",
+                "param": "enable_trailing_period",
                 "filter": filter_trailing_period,
             },
             "Capitalized summary (merge commits)": {
-                "param": "capitalized_summary",
+                "param": "enable_capitalized_summary",
                 "filter": filter_capitalized,
             },
             "Signle line summary (merge commits)": {
-                "param": "singleline_summary",
+                "param": "enable_singleline_summary",
                 "filter": filter_singleline,
             },
             "Signoff (merge commits)": {
-                "param": "signoff",
+                "param": "enable_signoff",
                 "filter": filter_signoff,
             },
             "GPG (merge commits)": {
-                "param": "gpg",
+                "param": "enable_gpg",
                 "filter": filter_gpg,
             },
             "Regex (merge commits)": {
-                "param": "regex",
+                "param": "enable_regex",
                 "filter": filter_regex,
             },
             "Author name regex (merge commits)": {
-                "param": "author_name_regex",
+                "param": "enable_author_name_regex",
                 "filter": filter_author_name_regex,
             },
             "Author email regex (merge commits)": {
-                "param": "author_email_regex",
+                "param": "enable_author_email_regex",
                 "filter": filter_author_email_regex,
             },
         },

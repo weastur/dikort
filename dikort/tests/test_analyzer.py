@@ -102,7 +102,7 @@ class TestAnalyzer(TestCase):
         _open_repository_mock,
     ):
         config = copy.deepcopy(DEFAULTS.copy())
-        config["rules"]["length"] = True
+        config["rules"]["enable_length"] = True
         repo = Mock()
         _open_repository_mock.return_value = repo
         _generic_check_mock.return_value = []

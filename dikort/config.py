@@ -34,15 +34,15 @@ DEFAULTS = types.MappingProxyType(
             "range": "HEAD",
         },
         "rules": {
-            "length": False,
-            "capitalized_summary": False,
-            "trailing_period": False,
-            "singleline_summary": False,
-            "signoff": False,
-            "gpg": False,
-            "regex": False,
-            "author_name_regex": False,
-            "author_email_regex": False,
+            "enable_length": False,
+            "enable_capitalized_summary": False,
+            "enable_trailing_period": False,
+            "enable_singleline_summary": False,
+            "enable_signoff": False,
+            "enable_gpg": False,
+            "enable_regex": False,
+            "enable_author_name_regex": False,
+            "enable_author_email_regex": False,
         },
         "rules.settings": {
             "min_length": 10,
@@ -57,15 +57,15 @@ DEFAULTS = types.MappingProxyType(
             "author_email_regex": ".*",
         },
         "merge_rules": {
-            "length": False,
-            "capitalized_summary": False,
-            "trailing_period": False,
-            "singleline_summary": False,
-            "signoff": False,
-            "gpg": False,
-            "regex": False,
-            "author_name_regex": False,
-            "author_email_regex": False,
+            "enable_length": False,
+            "enable_capitalized_summary": False,
+            "enable_trailing_period": False,
+            "enable_singleline_summary": False,
+            "enable_signoff": False,
+            "enable_gpg": False,
+            "enable_regex": False,
+            "enable_author_name_regex": False,
+            "enable_author_email_regex": False,
         },
         "merge_rules.settings": {
             "min_length": 10,
@@ -314,65 +314,65 @@ def configure_argparser(cmd_args_parser):  # noqa: WPS213
     cmd_args_parser.add_argument(
         "--enable-length-check",
         action="store_true",
-        dest="rules:length",
+        dest="rules:enable_length",
         default=None,
-        help=f"Enable length check (default: {DEFAULTS['rules']['length']})",
+        help=f"Enable length check (default: {DEFAULTS['rules']['enable_length']})",
     )
     cmd_args_parser.add_argument(
         "--enable-capitalized-summary-check",
         action="store_true",
-        dest="rules:capitalized_summary",
+        dest="rules:enable_capitalized_summary",
         default=None,
-        help=f"Enable capitalized summary check (default: {DEFAULTS['rules']['capitalized_summary']})",
+        help=f"Enable capitalized summary check (default: {DEFAULTS['rules']['enable_capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-trailing-period-check",
         action="store_true",
-        dest="rules:trailing_period",
+        dest="rules:enable_trailing_period",
         default=None,
-        help=f"Enable trailing period check (default: {DEFAULTS['rules']['trailing_period']})",
+        help=f"Enable trailing period check (default: {DEFAULTS['rules']['enable_trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--enable-singleline-summary-check",
         action="store_true",
-        dest="rules:singleline_summary",
+        dest="rules:enable_singleline_summary",
         default=None,
-        help=f"Enable single line summary check (default: {DEFAULTS['rules']['singleline_summary']})",
+        help=f"Enable single line summary check (default: {DEFAULTS['rules']['enable_singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-signoff-check",
         action="store_true",
-        dest="rules:signoff",
+        dest="rules:enable_signoff",
         default=None,
-        help=f"Enable checking for signoff (default: {DEFAULTS['rules']['signoff']})",
+        help=f"Enable checking for signoff (default: {DEFAULTS['rules']['enable_signoff']})",
     )
     cmd_args_parser.add_argument(
         "--enable-gpg-check",
         action="store_true",
-        dest="rules:gpg",
+        dest="rules:enable_gpg",
         default=None,
-        help=f"Enable checking for GPG sign (default: {DEFAULTS['rules']['gpg']})",
+        help=f"Enable checking for GPG sign (default: {DEFAULTS['rules']['enable_gpg']})",
     )
     cmd_args_parser.add_argument(
         "--enable-regex-check",
         action="store_true",
-        dest="rules:regex",
+        dest="rules:enable_regex",
         default=None,
-        help=f"Enable check by regex (default: {DEFAULTS['rules']['regex']})",
+        help=f"Enable check by regex (default: {DEFAULTS['rules']['enable_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-author-name-regex-check",
         action="store_true",
-        dest="rules:author_name_regex",
+        dest="rules:enable_author_name_regex",
         default=None,
-        help=f"Enable author name check by regex (default: {DEFAULTS['rules']['author_name_regex']})",
+        help=f"Enable author name check by regex (default: {DEFAULTS['rules']['enable_author_name_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-author-email-regex-check",
         action="store_true",
-        dest="rules:author_email_regex",
+        dest="rules:enable_author_email_regex",
         default=None,
-        help=f"Enable author email check by regex (default: {DEFAULTS['rules']['author_email_regex']})",
+        help=f"Enable author email check by regex (default: {DEFAULTS['rules']['enable_author_email_regex']})",
     )
     cmd_args_parser.add_argument(
         "--merge-min-length",
@@ -475,64 +475,64 @@ def configure_argparser(cmd_args_parser):  # noqa: WPS213
         "--enable-merge-length-check",
         action="store_true",
         default=None,
-        dest="merge_rules:length",
-        help=f"Enable length check (default: {DEFAULTS['merge_rules']['length']})",
+        dest="merge_rules:enable_length",
+        help=f"Enable length check (default: {DEFAULTS['merge_rules']['enable_length']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-capitalized-summary-check",
         action="store_true",
         default=None,
-        dest="merge_rules:capitalized_summary",
-        help=f"Enable capitalized summary check (default: {DEFAULTS['merge_rules']['capitalized_summary']})",
+        dest="merge_rules:enable_capitalized_summary",
+        help=f"Enable capitalized summary check (default: {DEFAULTS['merge_rules']['enable_capitalized_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-trailing-period-check",
         action="store_true",
         default=None,
-        dest="merge_rules:trailing_period",
-        help=f"Enable trailing period check (default: {DEFAULTS['merge_rules']['trailing_period']})",
+        dest="merge_rules:enable_trailing_period",
+        help=f"Enable trailing period check (default: {DEFAULTS['merge_rules']['enable_trailing_period']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-singleline-summary-check",
         action="store_true",
         default=None,
-        dest="merge_rules:singleline_summary",
-        help=f"Enable single line summary check (default: {DEFAULTS['merge_rules']['singleline_summary']})",
+        dest="merge_rules:enable_singleline_summary",
+        help=f"Enable single line summary check (default: {DEFAULTS['merge_rules']['enable_singleline_summary']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-signoff-check",
         action="store_true",
         default=None,
-        dest="merge_rules:signoff",
-        help=f"Enable checking for signoff (default: {DEFAULTS['merge_rules']['signoff']})",
+        dest="merge_rules:enable_signoff",
+        help=f"Enable checking for signoff (default: {DEFAULTS['merge_rules']['enable_signoff']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-gpg-check",
         action="store_true",
         default=None,
-        dest="merge_rules:gpg",
-        help=f"Enable checking for GPG sign (default: {DEFAULTS['merge_rules']['gpg']})",
+        dest="merge_rules:enable_gpg",
+        help=f"Enable checking for GPG sign (default: {DEFAULTS['merge_rules']['enable_gpg']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-regex-check",
         action="store_true",
         default=None,
-        dest="merge_rules:regex",
-        help=f"Enable check by regex (default: {DEFAULTS['merge_rules']['regex']})",
+        dest="merge_rules:enable_regex",
+        help=f"Enable check by regex (default: {DEFAULTS['merge_rules']['enable_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-author-name-regex-check",
         action="store_true",
         default=None,
-        dest="merge_rules:author_name_regex",
-        help=f"Enable author name check by regex (default: {DEFAULTS['merge_rules']['author_name_regex']})",
+        dest="merge_rules:enable_author_name_regex",
+        help=f"Enable author name check by regex (default: {DEFAULTS['merge_rules']['enable_author_name_regex']})",
     )
     cmd_args_parser.add_argument(
         "--enable-merge-author-email-regex-check",
         action="store_true",
         default=None,
-        dest="merge_rules:author_email_regex",
-        help=f"Enable author email check by regex (default: {DEFAULTS['merge_rules']['author_email_regex']})",
+        dest="merge_rules:enable_author_email_regex",
+        help=f"Enable author email check by regex (default: {DEFAULTS['merge_rules']['enable_author_email_regex']})",
     )
     cmd_args_parser.add_argument(
         "main:range",
