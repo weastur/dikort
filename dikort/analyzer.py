@@ -37,7 +37,7 @@ RULES = types.MappingProxyType(
                 "param": "enable_capitalized_summary",
                 "filter": filter_capitalized,
             },
-            "Signle line summary": {
+            "Single line summary": {
                 "param": "enable_singleline_summary",
                 "filter": filter_singleline,
             },
