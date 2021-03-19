@@ -2,7 +2,6 @@
 
 set -ex
 
-dikort
 black --check dikort
 isort -c dikort
 flake8 dikort

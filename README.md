@@ -14,7 +14,7 @@ The tool that helps you make commit message in your repository clear.
 ## Key Features
 
 * Wide check list: author name, email, trailing periods, capitalize sentence, singleline summary, singoff, gpg, regex.
-* Checks any commit range: acceptable for both CI and pre-commit hook usage
+* Checks any commit range: acceptable for both CI and post-commit hook usage
 * Separate rules for both: merge and regular commits
 * Support all available python versions: 3.6+
 
@@ -43,20 +43,20 @@ By default, pip tries to install package directly to you system. You may need to
 sudo pip3 install dikort
 ```
 
-The more right way is to **install to your home directory**. But be sure you have `$HOME/.local/bin` at your `$PATH` variable 
+The more right way is to **install to your home directory**. But be sure you have `$HOME/.local/bin` at your `$PATH` variable
 ```shell
 pip3 install --user dikort
 ```
 
 ## Running and Configuring
 
-Dikort is a command line tool. To see all available options with explanation hit `dikort -h`. 
+Dikort is a command line tool. To see all available options with explanation hit `dikort -h`.
 The only one unnamed option is commit range in the notation of `"<commit1>..<commit2>"`, where `"commit1"` and `"commit2"` are any of:
 hash, branch, tag, HEAD pointer.
 
 ### Examples
 
-#### Check last commit. Use this in git pre-commit hook
+#### Check last commit. Use this in git post-commit hook
 ```shell
 dikort HEAD~1..HEAD
 ```
@@ -91,7 +91,7 @@ docker run -v `pwd`:/tmp/repo weastur/dikort:latest --repository=/tmp/repo --ena
 
 ## File configuration
 
-Refer to [config example](./dikort.example.cfg), as a full configuration file. By default, config searched at `./.dikort.cfg` 
+Refer to [config example](./dikort.example.cfg), as a full configuration file. By default, config searched at `./.dikort.cfg`
 
 ## Development Status
 
