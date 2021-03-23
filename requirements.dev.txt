@@ -1,4 +1,4 @@
-setuptools==54.1.2
+setuptools==54.2.0
 wheel==0.36.2
 build==0.3.1.post1
 twine==3.4.1
