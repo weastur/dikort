@@ -1,4 +1,4 @@
-FROM python:3.9.3-alpine3.13
+FROM python:3.9.4-alpine3.13
 
 RUN apk add --no-cache git \
     && pip3 install dikort==0.2.1
