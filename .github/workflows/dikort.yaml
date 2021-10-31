@@ -1,0 +1,23 @@
+---
+name: dikort
+on: [pull_request]
+jobs:
+  all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: ${{ github.event.pull_request.commits }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements.dev.txt') }}
+      - name: Install dikort
+        run: pip3 install -c requirements.dev.txt dikort
+      - name: Check commits with dikort
+        run: dikort HEAD

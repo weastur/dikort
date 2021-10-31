@@ -1,0 +1,39 @@
+---
+name: Lint and Test
+on: [push]
+jobs:
+  all:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - '3.6'
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ matrix.python }}-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements.dev.txt') }}
+      - name: Install dependencies
+        run: pip install '.[dev]'
+      - name: Lint with black
+        run: black --check dikort
+      - name: Lint with isort
+        run: isort -c dikort
+      - name: Lint with flake8
+        run: flake8 dikort
+      - name: Test with unittest
+        run: coverage run -m unittest discover > /dev/null
+      - uses: codecov/codecov-action@v2
+        with:
+          files: .coverage
+          fail_ci_if_error: true
+          verbose: true
