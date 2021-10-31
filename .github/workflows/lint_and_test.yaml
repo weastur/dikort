@@ -31,9 +31,12 @@ jobs:
       - name: Lint with flake8
         run: flake8 dikort
       - name: Test with unittest
-        run: coverage run -m unittest discover > /dev/null
+        run: |
+          coverage run -m unittest discover > /dev/null
+          coverage xml
       - uses: codecov/codecov-action@v2
         with:
-          files: .coverage
+          files: coverage.xml
+          flags: unittests
           fail_ci_if_error: true
           verbose: true
