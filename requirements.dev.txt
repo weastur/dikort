@@ -3,7 +3,7 @@ wheel==0.37.0
 build==0.7.0
 twine==3.6.0
 black==21.11b1
-coverage==6.1.2
+coverage==6.2
 codecov==2.1.12
 isort==5.10.1
 wemake-python-styleguide==0.15.3
