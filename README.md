@@ -16,12 +16,12 @@ The tool that helps you make commit messages in your repository more clear.
 * Wide check list: author name, email, trailing periods, capitalize sentence, singleline summary, singoff, gpg, regex.
 * Checks any commit range: acceptable for both CI and post-commit hook usage
 * Separate rules for both: merge and regular commits
-* Support all available python versions: 3.6+
+* Support all available python versions: 3.7+
 
 ## Technical Requirements/Installation
 
 ### Pre-requirements
-Install any supported python distribution (for now it's 3.6+), and pip package management tool. Also make sure you have git installed
+Install any supported python distribution (for now it's 3.7+), and pip package management tool. Also make sure you have git installed
 
 Examples:
 
